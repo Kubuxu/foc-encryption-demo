@@ -55,13 +55,13 @@
 
 ### Tests for US3
 
-- [ ] T013 [US3] Write failing integration test in `demo/tests/integration/encrypt-decrypt.test.ts` — encrypt a small file (<256KiB) with hex key, verify output is valid foc-encryption blob (parseable envelope); encrypt with password, verify salt in appMetadata
+- [X] T013 [US3] Write failing integration test in `demo/tests/integration/encrypt-decrypt.test.ts` — encrypt a small file (<256KiB) with hex key, verify output is valid foc-encryption blob (parseable envelope); encrypt with password, verify salt in appMetadata
 
 ### Implementation for US3
 
-- [ ] T014 [US3] Implement `demo/src/commands/encrypt.ts` — read file, resolve key, auto-select algorithm, call `foc-encryption.encrypt()`, write blob to output, print metadata (algorithm, plaintext size, blob size, chunk count if seekable)
-- [ ] T015 [US3] Wire encrypt command in `demo/src/cli.ts` — replace stub dispatch with import of encrypt handler
-- [ ] T016 [US3] Verify integration test from T013 passes; manually test with a real file
+- [X] T014 [US3] Implement `demo/src/commands/encrypt.ts` — read file, resolve key, auto-select algorithm, call `foc-encryption.encrypt()`, write blob to output, print metadata (algorithm, plaintext size, blob size, chunk count if seekable)
+- [X] T015 [US3] Wire encrypt command in `demo/src/cli.ts` — replace stub dispatch with import of encrypt handler
+- [X] T016 [US3] Verify integration test from T013 passes; manually test with a real file
 
 **Checkpoint**: `foc-demo encrypt` works end-to-end with both key and password modes. Integration test green.
 
