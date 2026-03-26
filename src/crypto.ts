@@ -12,7 +12,11 @@ export async function aesGcmEncrypt(
   plaintext: Uint8Array,
   additionalData: Uint8Array
 ): Promise<Uint8Array> {
-  const result = await c.subtle.encrypt({ name: 'AES-GCM', iv, additionalData, tagLength: 128 }, key, plaintext)
+  const result = await c.subtle.encrypt(
+    { name: 'AES-GCM', iv: iv as BufferSource, additionalData: additionalData as BufferSource, tagLength: 128 },
+    key,
+    plaintext as BufferSource
+  )
   return new Uint8Array(result)
 }
 
@@ -22,10 +26,14 @@ export async function aesGcmDecrypt(
   ciphertext: Uint8Array,
   additionalData: Uint8Array
 ): Promise<Uint8Array> {
-  const result = await c.subtle.decrypt({ name: 'AES-GCM', iv, additionalData, tagLength: 128 }, key, ciphertext)
+  const result = await c.subtle.decrypt(
+    { name: 'AES-GCM', iv: iv as BufferSource, additionalData: additionalData as BufferSource, tagLength: 128 },
+    key,
+    ciphertext as BufferSource
+  )
   return new Uint8Array(result)
 }
 
 export async function importAesGcmKey(rawKey: Uint8Array): Promise<CryptoKey> {
-  return c.subtle.importKey('raw', rawKey, 'AES-GCM', false, ['encrypt', 'decrypt'])
+  return c.subtle.importKey('raw', rawKey as BufferSource, 'AES-GCM', false, ['encrypt', 'decrypt'])
 }

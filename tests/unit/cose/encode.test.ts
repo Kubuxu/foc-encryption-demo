@@ -1,14 +1,14 @@
 import * as cborg from 'cborg'
 import { describe, expect, it } from 'vitest'
-import { encodeCoseEncrypt0 } from '../../../src/cose/encode.ts'
+import { encodeCoseEncrypt0 } from '../../../src/cose/encode.js'
 import {
   COSE_HEADER_ALG,
   COSE_HEADER_IV,
   COSE_HEADER_TYP,
   CoseAlgorithm,
   FOC_ENVELOPE_TYPE,
-} from '../../../src/cose/headers.ts'
-import { coseDecodeOptions } from '../../../src/cose/tags.ts'
+} from '../../../src/cose/headers.js'
+import { coseDecodeOptions } from '../../../src/cose/tags.js'
 
 const decodeOpts = coseDecodeOptions
 

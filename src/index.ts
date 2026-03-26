@@ -1,5 +1,5 @@
-export { encrypt, decrypt } from './envelope.ts'
-export { CoseAlgorithm, CoseHeaderParam } from './cose/headers.ts'
+export { encrypt, decrypt } from './envelope.js'
+export { CoseAlgorithm, CoseHeaderParam } from './cose/headers.js'
 export type {
   CEKBytes,
   EncryptOptions,
@@ -12,7 +12,7 @@ export type {
   ByteRange,
   BlobFetcher,
   CoseAlgorithmId,
-} from './types.ts'
+} from './types.js'
 export {
   FocEncryptionError,
   InvalidKeyError,
@@ -20,4 +20,4 @@ export {
   UnsupportedSchemeError,
   MalformedEnvelopeError,
   SchemeNotSeekableError,
-} from './errors.ts'
+} from './errors.js'

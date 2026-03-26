@@ -10,13 +10,13 @@ function makeTagged(tag: number, value: unknown): CborTagged {
   return { tag, value }
 }
 
-export const coseTagDecoders: Record<number, (value: unknown) => CborTagged> = {
-  [COSE_TAG_ENCRYPT0]: (value) => makeTagged(COSE_TAG_ENCRYPT0, value),
-  [COSE_TAG_ENCRYPT]: (value) => makeTagged(COSE_TAG_ENCRYPT, value),
-}
+/** Sparse array of tag decoders indexed by CBOR tag number */
+const coseTagDecoders: ((value: unknown) => CborTagged)[] = []
+coseTagDecoders[COSE_TAG_ENCRYPT0] = (value) => makeTagged(COSE_TAG_ENCRYPT0, value)
+coseTagDecoders[COSE_TAG_ENCRYPT] = (value) => makeTagged(COSE_TAG_ENCRYPT, value)
 
 /** Standard decode options for COSE structures: integer map keys + COSE tags */
 export const coseDecodeOptions = {
   tags: coseTagDecoders,
   useMaps: true,
-}
+} as const

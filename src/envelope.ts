@@ -1,12 +1,12 @@
-import { assembleBlob, parseBlob } from './blob.ts'
-import { decodeCoseEnvelope } from './cose/decode.ts'
-import { encodeCoseEncrypt, encodeCoseEncrypt0, getProtectedHeaderBytes } from './cose/encode.ts'
-import { CoseAlgorithm } from './cose/headers.ts'
-import { UnsupportedSchemeError } from './errors.ts'
-import { importAndZeroCek, validateCek } from './key-utils.ts'
-import { Aes256Gcm } from './schemes/aes-256-gcm.ts'
-import type { EncryptionScheme } from './schemes/scheme.ts'
-import type { CEKBytes, EncryptOptions, Recipient } from './types.ts'
+import { assembleBlob, parseBlob } from './blob.js'
+import { decodeCoseEnvelope } from './cose/decode.js'
+import { encodeCoseEncrypt, encodeCoseEncrypt0, getProtectedHeaderBytes } from './cose/encode.js'
+import { CoseAlgorithm } from './cose/headers.js'
+import { UnsupportedSchemeError } from './errors.js'
+import { importAndZeroCek, validateCek } from './key-utils.js'
+import { Aes256Gcm } from './schemes/aes-256-gcm.js'
+import type { EncryptionScheme } from './schemes/scheme.js'
+import type { CEKBytes, EncryptOptions, Recipient } from './types.js'
 
 function getScheme(algorithmId: number): EncryptionScheme {
   switch (algorithmId) {

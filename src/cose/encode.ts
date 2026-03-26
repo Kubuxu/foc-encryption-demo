@@ -1,5 +1,5 @@
 import * as cborg from 'cborg'
-import type { AppMetadata, Recipient } from '../types.ts'
+import type { AppMetadata, Recipient } from '../types.js'
 import {
   COSE_HEADER_ALG,
   COSE_HEADER_IV,
@@ -7,7 +7,7 @@ import {
   COSE_HEADER_TYP,
   CoseHeaderParam,
   FOC_ENVELOPE_TYPE,
-} from './headers.ts'
+} from './headers.js'
 
 interface EncodeOptions {
   appMetadata?: AppMetadata

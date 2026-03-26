@@ -1,6 +1,6 @@
 import * as cborg from 'cborg'
 import { describe, expect, it } from 'vitest'
-import { buildEncStructure } from '../../../src/cose/structures.ts'
+import { buildEncStructure } from '../../../src/cose/structures.js'
 
 describe('buildEncStructure (AAD)', () => {
   it('builds Encrypt0 context string per RFC 9052 Section 5.3', () => {

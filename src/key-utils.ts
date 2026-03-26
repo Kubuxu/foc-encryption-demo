@@ -1,5 +1,5 @@
-import { importAesGcmKey } from './crypto.ts'
-import { InvalidKeyError } from './errors.ts'
+import { importAesGcmKey } from './crypto.js'
+import { InvalidKeyError } from './errors.js'
 
 export function validateCek(cek: Uint8Array): void {
   if (cek.length !== 32) {

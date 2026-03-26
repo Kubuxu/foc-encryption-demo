@@ -1,9 +1,9 @@
 import * as cborg from 'cborg'
 import { describe, expect, it } from 'vitest'
-import { COSE_HEADER_ALG, COSE_HEADER_TYP, CoseAlgorithm, FOC_ENVELOPE_TYPE } from '../../src/cose/headers.ts'
-import { coseDecodeOptions } from '../../src/cose/tags.ts'
-import { decrypt, encrypt } from '../../src/envelope.ts'
-import { AuthenticationError } from '../../src/errors.ts'
+import { COSE_HEADER_ALG, COSE_HEADER_TYP, CoseAlgorithm, FOC_ENVELOPE_TYPE } from '../../src/cose/headers.js'
+import { coseDecodeOptions } from '../../src/cose/tags.js'
+import { decrypt, encrypt } from '../../src/envelope.js'
+import { AuthenticationError } from '../../src/errors.js'
 
 const decodeOpts = coseDecodeOptions
 

@@ -1,6 +1,6 @@
 import * as cborg from 'cborg'
 import { describe, expect, it } from 'vitest'
-import { assembleBlob, parseBlob } from '../../src/blob.ts'
+import { assembleBlob, parseBlob } from '../../src/blob.js'
 
 describe('assembleBlob', () => {
   it('concatenates envelope and ciphertext', () => {

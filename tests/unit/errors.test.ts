@@ -6,7 +6,7 @@ import {
   MalformedEnvelopeError,
   SchemeNotSeekableError,
   UnsupportedSchemeError,
-} from '../../src/errors.ts'
+} from '../../src/errors.js'
 
 describe('FocEncryptionError', () => {
   it('is an instance of Error', () => {

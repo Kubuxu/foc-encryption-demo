@@ -5,7 +5,7 @@ import {
   COSE_HEADER_TYP,
   CoseAlgorithm,
   CoseHeaderParam,
-} from '../../../src/cose/headers.ts'
+} from '../../../src/cose/headers.js'
 
 describe('CoseAlgorithm', () => {
   it('has AES_256_GCM = 3', () => {

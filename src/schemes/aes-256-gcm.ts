@@ -1,7 +1,7 @@
-import { buildEncStructure } from '../cose/structures.ts'
-import { aesGcmDecrypt, aesGcmEncrypt, getRandomValues } from '../crypto.ts'
-import { AuthenticationError } from '../errors.ts'
-import type { EncryptResult, EncryptionScheme } from './scheme.ts'
+import { buildEncStructure } from '../cose/structures.js'
+import { aesGcmDecrypt, aesGcmEncrypt, getRandomValues } from '../crypto.js'
+import { AuthenticationError } from '../errors.js'
+import type { EncryptResult, EncryptionScheme } from './scheme.js'
 
 const AES_GCM_IV_LENGTH = 12
 const AES_GCM_TAG_LENGTH = 16

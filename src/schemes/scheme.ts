@@ -1,4 +1,4 @@
-import type { AppMetadata } from '../types.ts'
+import type { AppMetadata } from '../types.js'
 
 export interface EncryptionScheme {
   readonly name: string

@@ -1,9 +1,9 @@
 import * as cborg from 'cborg'
 import { describe, expect, it } from 'vitest'
-import { COSE_HEADER_ALG } from '../../../src/cose/headers.ts'
-import { importAesGcmKey } from '../../../src/crypto.ts'
-import { AuthenticationError } from '../../../src/errors.ts'
-import { Aes256Gcm } from '../../../src/schemes/aes-256-gcm.ts'
+import { COSE_HEADER_ALG } from '../../../src/cose/headers.js'
+import { importAesGcmKey } from '../../../src/crypto.js'
+import { AuthenticationError } from '../../../src/errors.js'
+import { Aes256Gcm } from '../../../src/schemes/aes-256-gcm.js'
 
 describe('Aes256Gcm scheme', () => {
   const scheme = new Aes256Gcm()
