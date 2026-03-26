@@ -106,8 +106,8 @@ export async function uploadFile(flags: UploadFlags): Promise<void> {
 
   const algorithmName = isChunked ? 'Chunked-AES-256-GCM-STREAM' : 'AES-256-GCM'
   console.log(`PieceCID:       ${result.pieceCid.toString()}`)
-  if (result.copies.length > 0) {
-    console.log(`Retrieval URL:  ${result.copies[0].retrievalUrl}`)
+  for (const copy of result.copies) {
+    console.log(`Retrieval URL:  ${copy.retrievalUrl}`)
   }
   console.log(`Algorithm:      ${algorithmName}`)
   console.log(`Plaintext size: ${formatSize(plaintext.length)}`)
