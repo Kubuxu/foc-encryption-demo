@@ -5,7 +5,7 @@ import { CoseAlgorithm } from './cose/headers.js'
 import { MalformedEnvelopeError, SchemeNotSeekableError, UnsupportedSchemeError } from './errors.js'
 import { importAndZeroCek, validateCek } from './key-utils.js'
 import { Aes256Gcm } from './schemes/aes-256-gcm.js'
-import { ChunkedAes256GcmStream } from './schemes/chunked-aes-256-gcm.js'
+import { ChunkedAes256GcmStream, DEFAULT_CHUNK_SIZE } from './schemes/chunked-aes-256-gcm.js'
 import type { DecryptMetadata, EncryptionScheme } from './schemes/scheme.js'
 import type {
   AppMetadata,
@@ -101,7 +101,7 @@ export async function decryptRange(
   const key = await importAndZeroCek(cekCopy)
 
   const chunkedScheme = scheme as ChunkedAes256GcmStream
-  const effectiveChunkSize = metadata.chunkSize ?? 262144
+  const effectiveChunkSize = metadata.chunkSize ?? DEFAULT_CHUNK_SIZE
   const tagLength = 16
   const ciphertextChunkSize = effectiveChunkSize + tagLength
 
