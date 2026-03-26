@@ -15,14 +15,15 @@ export function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
 }
 
-// USDFC uses 6 decimal places
-const USDFC_DECIMALS = 6n
-const USDFC_SCALE = 10n ** USDFC_DECIMALS
+// USDFC uses 18 decimals (attoUSDFC) like other EVM tokens on Filecoin
+const USDFC_SCALE = 10n ** 18n
+const USDFC_DISPLAY_DECIMALS = 6
 
 export function formatUSDFC(amount: bigint): string {
   const whole = amount / USDFC_SCALE
   const frac = amount % USDFC_SCALE
-  return `${whole}.${frac.toString().padStart(Number(USDFC_DECIMALS), '0')} USDFC`
+  const fracStr = frac.toString().padStart(18, '0').slice(0, USDFC_DISPLAY_DECIMALS)
+  return `${whole}.${fracStr} USDFC`
 }
 
 const CHUNKED_THRESHOLD = 256 * 1024 // 256 KiB
