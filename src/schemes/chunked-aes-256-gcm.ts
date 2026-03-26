@@ -1,6 +1,6 @@
 import { buildEncStructure } from '../cose/structures.js'
 import { aesGcmDecrypt, aesGcmEncrypt, getRandomValues } from '../crypto.js'
-import { AuthenticationError } from '../errors.js'
+import { AuthenticationError, FocEncryptionError, MalformedEnvelopeError } from '../errors.js'
 import type { DecryptMetadata, EncryptResult, EncryptionScheme } from './scheme.js'
 
 const BASE_NONCE_LENGTH = 7
@@ -27,7 +27,7 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
     const baseNonce = getRandomValues(BASE_NONCE_LENGTH)
     const chunkCount = Math.max(1, Math.ceil(plaintext.length / this.chunkSize))
     if (chunkCount - 1 > MAX_CHUNK_INDEX) {
-      throw new Error(
+      throw new FocEncryptionError(
         `Plaintext too large: ${chunkCount} chunks exceeds the 4-byte counter maximum (${MAX_CHUNK_INDEX + 1})`
       )
     }
@@ -73,7 +73,7 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
     const ciphertextChunkSize = effectiveChunkSize + AES_GCM_TAG_LENGTH
     const effectiveChunkCount = metadata?.chunkCount ?? Math.ceil(ciphertext.length / ciphertextChunkSize)
     if (effectiveChunkCount - 1 > MAX_CHUNK_INDEX) {
-      throw new Error(`Chunk count ${effectiveChunkCount} exceeds the 4-byte counter maximum`)
+      throw new MalformedEnvelopeError(`Chunk count ${effectiveChunkCount} exceeds the 4-byte counter maximum`)
     }
 
     const plaintextChunks: Uint8Array[] = []
@@ -121,7 +121,7 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
 
     const firstChunk = Math.floor(plaintextOffset / effectiveChunkSize)
     if (effectiveChunkCount - 1 > MAX_CHUNK_INDEX) {
-      throw new Error(`Chunk count ${effectiveChunkCount} exceeds the 4-byte counter maximum`)
+      throw new MalformedEnvelopeError(`Chunk count ${effectiveChunkCount} exceeds the 4-byte counter maximum`)
     }
     const lastChunk = Math.min(
       Math.floor((plaintextOffset + plaintextLength - 1) / effectiveChunkSize),
