@@ -1,14 +1,25 @@
 import { Synapse } from '@filoz/synapse-sdk'
+import { http } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
 import type { BlobFetcher } from 'foc-encryption'
+
+const RPC_URL = process.env.RPC_URL || 'https://api.calibration.node.glif.io/rpc/v1'
 
 export interface SynapseConfig {
   privateKey: string
   source?: string
 }
 
-export async function createSynapseClient(config: SynapseConfig): Promise<Synapse> {
-  const privateKey = config.privateKey.startsWith('0x') ? config.privateKey : `0x${config.privateKey}`
-  return Synapse.create({ privateKey })
+export function createSynapseClient(config: SynapseConfig): Synapse {
+  const privateKey = config.privateKey.startsWith('0x')
+    ? (config.privateKey as `0x${string}`)
+    : (`0x${config.privateKey}` as `0x${string}`)
+  const account = privateKeyToAccount(privateKey)
+  return Synapse.create({
+    account,
+    transport: http(RPC_URL),
+    source: config.source ?? 'foc-demo',
+  })
 }
 
 export function createBlobFetcher(url: string): BlobFetcher {

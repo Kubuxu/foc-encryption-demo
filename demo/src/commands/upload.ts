@@ -40,17 +40,19 @@ export async function uploadFile(flags: UploadFlags): Promise<void> {
     appMetadata: hasMetadata ? appMetadata : undefined,
   })
 
-  const synapse = await createSynapseClient({ privateKey })
-  const storage = await synapse.createStorage()
-  const task = storage.upload(blob)
-
-  const commP = await task.commp()
-  await task.store()
-  const retrievalUrl = await task.done()
+  const synapse = createSynapseClient({ privateKey })
+  const result = await synapse.storage.upload(blob, {
+    callbacks: {
+      onProgress: (bytes) => process.stderr.write(`\rUploading... ${formatSize(bytes)}`),
+    },
+  })
+  process.stderr.write('\r\x1b[K')
 
   const algorithmName = isChunked ? 'Chunked-AES-256-GCM-STREAM' : 'AES-256-GCM'
-  console.log(`PieceCID:       ${commP.toString()}`)
-  console.log(`Retrieval URL:  ${retrievalUrl}`)
+  console.log(`PieceCID:       ${result.pieceCid.toString()}`)
+  if (result.copies.length > 0) {
+    console.log(`Retrieval URL:  ${result.copies[0].retrievalUrl}`)
+  }
   console.log(`Algorithm:      ${algorithmName}`)
   console.log(`Plaintext size: ${formatSize(plaintext.length)}`)
   console.log(`Blob size:      ${formatSize(blob.length)}`)

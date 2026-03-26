@@ -23,17 +23,20 @@ describe('upload command', () => {
     tempDir = await mkdtemp(join(tmpdir(), 'foc-upload-test-'))
     capturedBlob = undefined
 
-    vi.mocked(createSynapseClient).mockResolvedValue({
-      createStorage: vi.fn().mockResolvedValue({
-        upload: vi.fn((data: Uint8Array) => {
+    vi.mocked(createSynapseClient).mockReturnValue({
+      storage: {
+        upload: vi.fn(async (data: Uint8Array) => {
           capturedBlob = new Uint8Array(data)
           return {
-            commp: vi.fn().mockResolvedValue({ toString: () => fakePieceCid }),
-            store: vi.fn().mockResolvedValue('mock-storage-provider'),
-            done: vi.fn().mockResolvedValue(fakeRetrievalUrl),
+            pieceCid: { toString: () => fakePieceCid },
+            size: data.length,
+            copies: [{ retrievalUrl: fakeRetrievalUrl }],
+            requestedCopies: 1,
+            complete: true,
+            failedAttempts: [],
           }
         }),
-      }),
+      },
     } as any)
   })
 
