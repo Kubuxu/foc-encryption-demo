@@ -113,7 +113,8 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
     plaintextOffset: number,
     plaintextLength: number,
     chunkSize?: number,
-    chunkCount?: number
+    chunkCount?: number,
+    chunkIndexOffset = 0
   ): Promise<Uint8Array> {
     const effectiveChunkSize = chunkSize ?? this.chunkSize
     const ciphertextChunkSize = effectiveChunkSize + AES_GCM_TAG_LENGTH
@@ -130,12 +131,13 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
 
     const plaintextChunks: Uint8Array[] = []
     for (let i = firstChunk; i <= lastChunk; i++) {
-      const isLast = i === effectiveChunkCount - 1
+      const globalIndex = i + chunkIndexOffset
+      const isLast = globalIndex === effectiveChunkCount - 1
       const ctStart = i * ciphertextChunkSize
       const ctEnd = isLast ? ciphertext.length : ctStart + ciphertextChunkSize
       const chunkCt = ciphertext.subarray(ctStart, ctEnd)
 
-      const nonce = deriveChunkNonce(iv, i, isLast)
+      const nonce = deriveChunkNonce(iv, globalIndex, isLast)
       const aad = buildEncStructure('Encrypt0', protectedHeaders, new Uint8Array(0))
       try {
         const decrypted = await aesGcmDecrypt(key, nonce, chunkCt, aad)

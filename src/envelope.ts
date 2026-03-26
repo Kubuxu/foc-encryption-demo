@@ -138,14 +138,12 @@ export async function decryptRange(
         ? undefined // fetch to end for last chunk (may be shorter)
         : envelope.envelopeSize + (lastChunk + 1) * ciphertextChunkSize
 
-    const fetchLength =
-      ctEnd !== undefined
-        ? ctEnd - ctStart
-        : firstChunk * ciphertextChunkSize + ciphertextChunkSize * (lastChunk - firstChunk + 1) + ciphertextChunkSize // overfetch is OK
+    const fetchLength = ctEnd !== undefined ? ctEnd - ctStart : (lastChunk - firstChunk + 1) * ciphertextChunkSize // overfetch last chunk is OK
     const fetched = await (blob as BlobFetcher).fetchRange(ctStart, fetchLength)
 
-    // Adjust: the fetched ciphertext starts at firstChunk, not 0
-    // We need to build a full ciphertext view or adjust offsets
+    // The fetched ciphertext starts at firstChunk, so adjust the plaintext offset
+    // to be relative to the fetched data, and pass chunkIndexOffset so nonces use
+    // global chunk indices.
     return chunkedScheme.decryptRange(
       key,
       fetched,
@@ -154,7 +152,8 @@ export async function decryptRange(
       range.offset - firstChunk * effectiveChunkSize,
       range.length,
       effectiveChunkSize,
-      envelope.chunkCount
+      envelope.chunkCount,
+      firstChunk
     )
   }
 
