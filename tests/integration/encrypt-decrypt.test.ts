@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { COSE_HEADER_ALG, COSE_HEADER_TYP, CoseAlgorithm, FOC_ENVELOPE_TYPE } from '../../src/cose/headers.js'
 import { coseDecodeOptions } from '../../src/cose/tags.js'
 import { decrypt, encrypt, parseEnvelope } from '../../src/envelope.js'
-import { AuthenticationError, UnsupportedSchemeError } from '../../src/errors.js'
+import { AuthenticationError, MalformedEnvelopeError, UnsupportedSchemeError } from '../../src/errors.js'
 
 const decodeOpts = coseDecodeOptions
 
@@ -133,6 +133,31 @@ describe('decrypt integration', () => {
     tampered[tampered.length - 1] ^= 0xff
 
     await expect(decrypt(tampered, cek)).rejects.toThrow(AuthenticationError)
+  })
+})
+
+describe('unsupported scheme', () => {
+  it('encrypt with unknown algorithm throws UnsupportedSchemeError', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new TextEncoder().encode('test')
+
+    // biome-ignore lint/suspicious/noExplicitAny: testing invalid algorithm ID
+    await expect(encrypt(plaintext, cek, { algorithm: 9999 as never })).rejects.toThrow(UnsupportedSchemeError)
+  })
+
+  it('decrypt blob with unknown algorithm throws UnsupportedSchemeError', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    // Encrypt normally, then tamper the envelope to have an unknown algorithm
+    const plaintext = new TextEncoder().encode('test')
+    const blob = await encrypt(plaintext, cek, { algorithm: CoseAlgorithm.AES_256_GCM })
+
+    // Build a blob with unknown algorithm using low-level encoding
+    const { encodeCoseEncrypt0 } = await import('../../src/cose/encode.js')
+    const { assembleBlob } = await import('../../src/blob.js')
+    const envelope = encodeCoseEncrypt0(9999, new Uint8Array(12))
+    const fakeBlob = assembleBlob(envelope, new Uint8Array(32))
+
+    await expect(decrypt(fakeBlob, cek)).rejects.toThrow(UnsupportedSchemeError)
   })
 })
 
