@@ -15,24 +15,25 @@ interface EncodeOptions {
   chunkCount?: number
 }
 
+/**
+ * Encode a CBOR tagged value. cborg doesn't expose a Tagged class for encoding,
+ * so we prepend the CBOR tag header bytes to the encoded value.
+ * Tag header format per RFC 8949 §3.1: major type 6 (0xc0) + tag number.
+ */
 function encodeCborTag(tag: number, value: unknown): Uint8Array {
   const valueBytes = cborg.encode(value)
-  let tagBytes: Uint8Array
-
-  if (tag < 24) {
-    tagBytes = new Uint8Array([0xc0 | tag])
-  } else if (tag < 256) {
-    tagBytes = new Uint8Array([0xd8, tag])
-  } else if (tag < 65536) {
-    tagBytes = new Uint8Array([0xd9, (tag >> 8) & 0xff, tag & 0xff])
-  } else {
-    tagBytes = new Uint8Array([0xda, (tag >> 24) & 0xff, (tag >> 16) & 0xff, (tag >> 8) & 0xff, tag & 0xff])
-  }
-
-  const result = new Uint8Array(tagBytes.length + valueBytes.length)
-  result.set(tagBytes, 0)
-  result.set(valueBytes, tagBytes.length)
+  const tagHeader = encodeCborTagHeader(tag)
+  const result = new Uint8Array(tagHeader.length + valueBytes.length)
+  result.set(tagHeader, 0)
+  result.set(valueBytes, tagHeader.length)
   return result
+}
+
+function encodeCborTagHeader(tag: number): Uint8Array {
+  if (tag < 24) return new Uint8Array([0xc0 | tag])
+  if (tag < 0x100) return new Uint8Array([0xd8, tag])
+  if (tag < 0x10000) return new Uint8Array([0xd9, (tag >> 8) & 0xff, tag & 0xff])
+  return new Uint8Array([0xda, (tag >> 24) & 0xff, (tag >> 16) & 0xff, (tag >> 8) & 0xff, tag & 0xff])
 }
 
 function buildUnprotectedMap(iv: Uint8Array, options?: EncodeOptions): Map<number, unknown> {
@@ -54,7 +55,7 @@ function buildUnprotectedMap(iv: Uint8Array, options?: EncodeOptions): Map<numbe
 export function encodeCoseEncrypt0(algorithmId: number, iv: Uint8Array, options?: EncodeOptions): Uint8Array {
   const protectedBytes = getProtectedHeaderBytes(algorithmId)
   const unprotectedMap = buildUnprotectedMap(iv, options)
-  return encodeCborTag(16, [protectedBytes, unprotectedMap, null]) // XXX: why are we using encodeCborTag? Why not encode all of these things togheater?
+  return encodeCborTag(16, [protectedBytes, unprotectedMap, null])
 }
 
 export function encodeCoseEncrypt(
