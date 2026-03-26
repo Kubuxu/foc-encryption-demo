@@ -57,6 +57,11 @@ export async function encrypt(
   }
 
   if (recipients && recipients.length > 0) {
+    for (const r of recipients) {
+      if (!r.wrappedKey || r.wrappedKey.length === 0) {
+        throw new MalformedEnvelopeError('Recipient must have a non-empty wrappedKey')
+      }
+    }
     envelope = encodeCoseEncrypt(options.algorithm, result.iv, recipients, encodeOpts)
   } else {
     envelope = encodeCoseEncrypt0(options.algorithm, result.iv, encodeOpts)
