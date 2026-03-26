@@ -36,12 +36,12 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Write failing tests for hex key parsing and PBKDF2 derivation in `demo/tests/unit/key.test.ts` — test hex validation (64 chars, invalid hex), PBKDF2 produces 32-byte key, same password+salt = same key, different salt = different key
-- [ ] T008 Implement `demo/src/key.ts` — `parseKeySource(flags)` returns `KeySource`, `deriveKey(source, existingSalt?)` returns `DerivedKey` using Web Crypto PBKDF2 (600k iterations, SHA-256, 16-byte salt), `hexToBytes(hex)` for key parsing
-- [ ] T009 Write failing tests for locator parsing in `demo/tests/unit/locator.test.ts` — HTTP URL detection, PieceCID detection, edge cases (https vs http, no protocol)
-- [ ] T010 Implement `demo/src/locator.ts` — `parseLocator(input)` returns `PieceLocator`, `resolveUrl(locator, synapse?)` returns HTTP URL string (passthrough for URL kind, synapse resolution for PieceCID kind)
-- [ ] T011 [P] Implement `demo/src/synapse.ts` — `createSynapseClient(config)` using `Synapse.create()` + `privateKeyToAccount()`, `createBlobFetcher(url)` returning `BlobFetcher` with HTTP Range fetch
-- [ ] T012 [P] Implement `demo/src/util.ts` — `formatError(err)` for actionable error messages, `formatSize(bytes)` for human-readable sizes, `autoSelectAlgorithm(fileSize)` returning encrypt options (chunked if >256KiB)
+- [X] T007 Write failing tests for hex key parsing and PBKDF2 derivation in `demo/tests/unit/key.test.ts` — test hex validation (64 chars, invalid hex), PBKDF2 produces 32-byte key, same password+salt = same key, different salt = different key
+- [X] T008 Implement `demo/src/key.ts` — `parseKeySource(flags)` returns `KeySource`, `deriveKey(source, existingSalt?)` returns `DerivedKey` using Web Crypto PBKDF2 (600k iterations, SHA-256, 16-byte salt), `hexToBytes(hex)` for key parsing
+- [X] T009 Write failing tests for locator parsing in `demo/tests/unit/locator.test.ts` — HTTP URL detection, PieceCID detection, edge cases (https vs http, no protocol)
+- [X] T010 Implement `demo/src/locator.ts` — `parseLocator(input)` returns `PieceLocator`, `resolveUrl(locator, synapse?)` returns HTTP URL string (passthrough for URL kind, synapse resolution for PieceCID kind)
+- [X] T011 [P] Implement `demo/src/synapse.ts` — `createSynapseClient(config)` using `Synapse.create()` + `privateKeyToAccount()`, `createBlobFetcher(url)` returning `BlobFetcher` with HTTP Range fetch
+- [X] T012 [P] Implement `demo/src/util.ts` — `formatError(err)` for actionable error messages, `formatSize(bytes)` for human-readable sizes, `autoSelectAlgorithm(fileSize)` returning encrypt options (chunked if >256KiB)
 
 **Checkpoint**: All unit tests pass. `parseKeySource`, `deriveKey`, `parseLocator`, `createBlobFetcher`, `formatError` are functional.
 

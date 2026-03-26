@@ -29,7 +29,7 @@ const encryptCommand = command(
   () => {
     console.error('not implemented')
     process.exit(1)
-  },
+  }
 )
 
 const decryptCommand = command(
@@ -60,7 +60,7 @@ const decryptCommand = command(
   () => {
     console.error('not implemented')
     process.exit(1)
-  },
+  }
 )
 
 const uploadCommand = command(
@@ -90,7 +90,7 @@ const uploadCommand = command(
   () => {
     console.error('not implemented')
     process.exit(1)
-  },
+  }
 )
 
 const downloadCommand = command(
@@ -125,7 +125,7 @@ const downloadCommand = command(
   () => {
     console.error('not implemented')
     process.exit(1)
-  },
+  }
 )
 
 const rangeCommand = command(
@@ -168,19 +168,11 @@ const rangeCommand = command(
   () => {
     console.error('not implemented')
     process.exit(1)
-  },
+  }
 )
 
-cli(
-  {
-    name: 'foc-demo',
-    version: '0.1.0',
-    commands: [
-      encryptCommand,
-      decryptCommand,
-      uploadCommand,
-      downloadCommand,
-      rangeCommand,
-    ],
-  },
-)
+cli({
+  name: 'foc-demo',
+  version: '0.1.0',
+  commands: [encryptCommand, decryptCommand, uploadCommand, downloadCommand, rangeCommand],
+})
