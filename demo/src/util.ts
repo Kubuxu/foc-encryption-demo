@@ -15,6 +15,16 @@ export function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
 }
 
+// USDFC uses 6 decimal places
+const USDFC_DECIMALS = 6n
+const USDFC_SCALE = 10n ** USDFC_DECIMALS
+
+export function formatUSDFC(amount: bigint): string {
+  const whole = amount / USDFC_SCALE
+  const frac = amount % USDFC_SCALE
+  return `${whole}.${frac.toString().padStart(Number(USDFC_DECIMALS), '0')} USDFC`
+}
+
 const CHUNKED_THRESHOLD = 256 * 1024 // 256 KiB
 
 export function autoSelectAlgorithm(fileSize: number): Pick<EncryptOptions, 'algorithm'> {

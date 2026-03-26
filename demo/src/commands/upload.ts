@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { encrypt, CoseAlgorithm, parseEnvelope } from 'foc-encryption'
 import { parseKeySource, deriveKey } from '../key.js'
-import { autoSelectAlgorithm, formatSize } from '../util.js'
+import { autoSelectAlgorithm, formatSize, formatUSDFC } from '../util.js'
 import { createSynapseClient } from '../synapse.js'
 
 export interface UploadFlags {
@@ -40,10 +40,27 @@ export async function uploadFile(flags: UploadFlags): Promise<void> {
     appMetadata: hasMetadata ? appMetadata : undefined,
   })
 
+  const synapse = createSynapseClient({ privateKey })
+
+  console.log('Estimating costs...')
+  const { costs, transaction } = await synapse.storage.prepare({ dataSize: BigInt(blob.length) })
+  console.log(`  Per epoch (30s): ${formatUSDFC(costs.rate.perEpoch)}`)
+  console.log(`  Per month:       ${formatUSDFC(costs.rate.perMonth)}`)
+  console.log(`  Deposit needed:  ${formatUSDFC(costs.depositNeeded)}`)
+  console.log(`  Ready:           ${costs.ready}`)
+
+  if (transaction) {
+    console.log(`  Deposit amount:      ${formatUSDFC(transaction.depositAmount)}`)
+    console.log(`  Includes approval:   ${transaction.includesApproval}`)
+    const { hash } = await transaction.execute({
+      onHash: (h) => console.log(`  Transaction hash: ${h}`),
+    })
+    console.log(`  Transaction confirmed: ${hash}`)
+  }
+
   const PROGRESS_CHUNK_SIZE = 1024 * 1024 // report every 1 MiB
   let lastReportedBytes = 0
 
-  const synapse = createSynapseClient({ privateKey })
   console.log('Uploading to Filecoin Calibration...')
   const result = await synapse.storage.upload(blob, {
     callbacks: {

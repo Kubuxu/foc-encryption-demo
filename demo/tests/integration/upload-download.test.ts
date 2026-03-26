@@ -25,6 +25,15 @@ describe('upload command', () => {
 
     vi.mocked(createSynapseClient).mockReturnValue({
       storage: {
+        prepare: vi.fn().mockResolvedValue({
+          costs: {
+            rate: { perEpoch: 1000n, perMonth: 2592000000n },
+            depositNeeded: 0n,
+            needsFwssMaxApproval: false,
+            ready: true,
+          },
+          transaction: null,
+        }),
         upload: vi.fn(async (data: Uint8Array) => {
           capturedBlob = new Uint8Array(data)
           return {
