@@ -19,12 +19,12 @@
 
 **Purpose**: Initialize the demo sub-project with pnpm workspace, TypeScript, and dependencies
 
-- [ ] T001 Add `packages` field to root `pnpm-workspace.yaml` with entries `['.', 'demo']`
-- [ ] T002 Create `demo/package.json` with `foc-encryption: "workspace:*"`, `cleye`, `@filoz/synapse-sdk`, `viem` dependencies; `"type": "module"`, `"private": true`
-- [ ] T003 Create `demo/tsconfig.json` with strict mode, ESM, project reference to parent (`{ "path": ".." }`)
-- [ ] T004 Run `pnpm install` to resolve workspace links and generate lockfile updates
-- [ ] T005 [P] Create `demo/src/cli.ts` with cleye setup — define all 5 subcommands (encrypt, decrypt, upload, download, range) with flags per cli-contract.md, dispatch stubs that print "not implemented"
-- [ ] T006 [P] Create `demo/vitest.config.ts` matching parent project pattern (test files in `demo/tests/**/*.test.ts`)
+- [X] T001 Add `packages` field to root `pnpm-workspace.yaml` with entries `['.', 'demo']`
+- [X] T002 Create `demo/package.json` with `foc-encryption: "workspace:*"`, `cleye`, `@filoz/synapse-sdk`, `viem` dependencies; `"type": "module"`, `"private": true`
+- [X] T003 Create `demo/tsconfig.json` with strict mode, ESM, project reference to parent (`{ "path": ".." }`)
+- [X] T004 Run `pnpm install` to resolve workspace links and generate lockfile updates
+- [X] T005 [P] Create `demo/src/cli.ts` with cleye setup — define all 5 subcommands (encrypt, decrypt, upload, download, range) with flags per cli-contract.md, dispatch stubs that print "not implemented"
+- [X] T006 [P] Create `demo/vitest.config.ts` matching parent project pattern (test files in `demo/tests/**/*.test.ts`)
 
 **Checkpoint**: `pnpm --filter foc-demo build` succeeds, `node demo/dist/cli.js --help` prints usage, `pnpm --filter foc-demo test` runs (no tests yet)
 

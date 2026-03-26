@@ -1,0 +1,29 @@
+{
+  "name": "foc-demo",
+  "version": "0.1.0",
+  "description": "CLI demo for foc-encryption — encrypt/decrypt files with FOC warm storage",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc --build --pretty",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "bin": {
+    "foc-demo": "./dist/cli.js"
+  },
+  "dependencies": {
+    "foc-encryption": "workspace:*",
+    "@filoz/synapse-sdk": "^0.1.0",
+    "cleye": "^1.3.2",
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.0.0"
+  }
+}

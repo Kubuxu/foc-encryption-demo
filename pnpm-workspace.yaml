@@ -1,1 +1,4 @@
+packages:
+  - '.'
+  - 'demo'
 onlyBuiltDependencies: '@biomejs/biome esbuild'
