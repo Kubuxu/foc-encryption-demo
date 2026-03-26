@@ -2,6 +2,7 @@
 import { cli, command } from 'cleye'
 import { encryptFile } from './commands/encrypt.js'
 import { decryptFile } from './commands/decrypt.js'
+import { uploadFile } from './commands/upload.js'
 
 const encryptCommand = command(
   {
@@ -107,9 +108,18 @@ const uploadCommand = command(
       },
     },
   },
-  () => {
-    console.error('not implemented')
-    process.exit(1)
+  async (argv) => {
+    try {
+      await uploadFile({
+        file: argv._.file,
+        key: argv.flags.key,
+        password: argv.flags.password,
+        privateKey: argv.flags.privateKey,
+      })
+    } catch (err) {
+      console.error(`Error: ${err instanceof Error ? err.message : String(err)}`)
+      process.exit(1)
+    }
   }
 )
 

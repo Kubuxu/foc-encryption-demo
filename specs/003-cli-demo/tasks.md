@@ -95,13 +95,13 @@
 
 ### Tests for US1
 
-- [ ] T021 [US1] Write failing integration test in `demo/tests/integration/upload-download.test.ts` — mock `@filoz/synapse-sdk` `Synapse.create()` and `storage.upload()`, verify encrypt is called before upload, verify PieceCID is returned, verify retrieval URL is printed
+- [X] T021 [US1] Write failing integration test in `demo/tests/integration/upload-download.test.ts` — mock `@filoz/synapse-sdk` `Synapse.create()` and `storage.upload()`, verify encrypt is called before upload, verify PieceCID is returned, verify retrieval URL is printed
 
 ### Implementation for US1
 
-- [ ] T022 [US1] Implement `demo/src/commands/upload.ts` — read file, resolve key, auto-select algorithm, encrypt, create synapse client (from `--private-key` or `FOC_PRIVATE_KEY`), call `synapse.storage.upload(blob)`, print PieceCID + retrieval URL + metadata
-- [ ] T023 [US1] Wire upload command in `demo/src/cli.ts`
-- [ ] T024 [US1] Verify integration test passes
+- [X] T022 [US1] Implement `demo/src/commands/upload.ts` — read file, resolve key, auto-select algorithm, encrypt, create synapse client (from `--private-key` or `FOC_PRIVATE_KEY`), call `synapse.storage.upload(blob)`, print PieceCID + retrieval URL + metadata
+- [X] T023 [US1] Wire upload command in `demo/src/cli.ts`
+- [X] T024 [US1] Verify integration test passes
 
 **Checkpoint**: Upload command works with mocked synapse-sdk. Output includes PieceCID and retrieval URL.
 
