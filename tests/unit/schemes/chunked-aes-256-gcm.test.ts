@@ -157,7 +157,25 @@ describe('ChunkedAes256GcmStream edge cases', () => {
     expect(decrypted).toEqual(plaintext)
   })
 
-  it('MAX_CHUNK_INDEX is 2^32 - 1', () => {
-    expect(MAX_CHUNK_INDEX).toBe(0xffffffff)
+  it('decrypt rejects chunkCount exceeding 4-byte counter max', async () => {
+    const scheme = new ChunkedAes256GcmStream({ chunkSize: 16 })
+    const rawKey = crypto.getRandomValues(new Uint8Array(32))
+    const key = await importAesGcmKey(rawKey)
+    const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, -65793]]))
+
+    await expect(
+      scheme.decrypt(key, new Uint8Array(0), new Uint8Array(7), protectedHeaders, 16, MAX_CHUNK_INDEX + 2)
+    ).rejects.toThrow(/exceeds the 4-byte counter maximum/)
+  })
+
+  it('decryptRange rejects chunkCount exceeding 4-byte counter max', async () => {
+    const scheme = new ChunkedAes256GcmStream({ chunkSize: 16 })
+    const rawKey = crypto.getRandomValues(new Uint8Array(32))
+    const key = await importAesGcmKey(rawKey)
+    const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, -65793]]))
+
+    await expect(
+      scheme.decryptRange(key, new Uint8Array(0), new Uint8Array(7), protectedHeaders, 0, 1, 16, MAX_CHUNK_INDEX + 2)
+    ).rejects.toThrow(/exceeds the 4-byte counter maximum/)
   })
 })
