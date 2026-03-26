@@ -1,12 +1,12 @@
-import type { CEKBytes, EncryptOptions, Recipient } from './types.ts'
-import { validateCek, importAndZeroCek } from './key-utils.ts'
-import { CoseAlgorithm } from './cose/headers.ts'
-import { encodeCoseEncrypt0, encodeCoseEncrypt, getProtectedHeaderBytes } from './cose/encode.ts'
-import { decodeCoseEnvelope } from './cose/decode.ts'
-import { Aes256Gcm } from './schemes/aes-256-gcm.ts'
 import { assembleBlob, parseBlob } from './blob.ts'
+import { decodeCoseEnvelope } from './cose/decode.ts'
+import { encodeCoseEncrypt, encodeCoseEncrypt0, getProtectedHeaderBytes } from './cose/encode.ts'
+import { CoseAlgorithm } from './cose/headers.ts'
 import { UnsupportedSchemeError } from './errors.ts'
+import { importAndZeroCek, validateCek } from './key-utils.ts'
+import { Aes256Gcm } from './schemes/aes-256-gcm.ts'
 import type { EncryptionScheme } from './schemes/scheme.ts'
+import type { CEKBytes, EncryptOptions, Recipient } from './types.ts'
 
 function getScheme(algorithmId: number): EncryptionScheme {
   switch (algorithmId) {
@@ -21,7 +21,7 @@ export async function encrypt(
   plaintext: Uint8Array,
   cek: CEKBytes,
   options: EncryptOptions,
-  recipients?: Recipient[],
+  recipients?: Recipient[]
 ): Promise<Uint8Array> {
   validateCek(cek)
   const scheme = getScheme(options.algorithm)

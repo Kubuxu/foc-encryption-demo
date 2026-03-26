@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { decodeCoseEnvelope } from '../../../src/cose/decode.ts'
 import { encodeCoseEncrypt0 } from '../../../src/cose/encode.ts'
-import { CoseAlgorithm, COSE_HEADER_IV, FOC_ENVELOPE_TYPE } from '../../../src/cose/headers.ts'
+import { COSE_HEADER_IV, CoseAlgorithm, FOC_ENVELOPE_TYPE } from '../../../src/cose/headers.ts'
 
 describe('decodeCoseEnvelope', () => {
   it('parses COSE_Encrypt0 (tag 16) envelope', () => {

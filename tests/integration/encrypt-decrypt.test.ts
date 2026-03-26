@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest'
 import * as cborg from 'cborg'
-import { encrypt, decrypt } from '../../src/envelope.ts'
-import { CoseAlgorithm, COSE_HEADER_ALG, COSE_HEADER_TYP, FOC_ENVELOPE_TYPE } from '../../src/cose/headers.ts'
+import { describe, expect, it } from 'vitest'
+import { COSE_HEADER_ALG, COSE_HEADER_TYP, CoseAlgorithm, FOC_ENVELOPE_TYPE } from '../../src/cose/headers.ts'
 import { coseDecodeOptions } from '../../src/cose/tags.ts'
+import { decrypt, encrypt } from '../../src/envelope.ts'
 import { AuthenticationError } from '../../src/errors.ts'
 
 const decodeOpts = coseDecodeOptions

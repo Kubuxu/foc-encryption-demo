@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
 import * as cborg from 'cborg'
+import { describe, expect, it } from 'vitest'
 import { assembleBlob, parseBlob } from '../../src/blob.ts'
 
 describe('assembleBlob', () => {

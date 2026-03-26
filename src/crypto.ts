@@ -10,7 +10,7 @@ export async function aesGcmEncrypt(
   key: CryptoKey,
   iv: Uint8Array,
   plaintext: Uint8Array,
-  additionalData: Uint8Array,
+  additionalData: Uint8Array
 ): Promise<Uint8Array> {
   const result = await c.subtle.encrypt({ name: 'AES-GCM', iv, additionalData, tagLength: 128 }, key, plaintext)
   return new Uint8Array(result)
@@ -20,7 +20,7 @@ export async function aesGcmDecrypt(
   key: CryptoKey,
   iv: Uint8Array,
   ciphertext: Uint8Array,
-  additionalData: Uint8Array,
+  additionalData: Uint8Array
 ): Promise<Uint8Array> {
   const result = await c.subtle.decrypt({ name: 'AES-GCM', iv, additionalData, tagLength: 128 }, key, ciphertext)
   return new Uint8Array(result)

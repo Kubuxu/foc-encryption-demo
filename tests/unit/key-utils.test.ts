@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { validateCek } from '../../src/key-utils.ts'
 import { InvalidKeyError } from '../../src/errors.ts'
+import { validateCek } from '../../src/key-utils.ts'
 
 describe('validateCek', () => {
   it('accepts a valid 32-byte key', () => {

@@ -7,7 +7,7 @@ import * as cborg from 'cborg'
 export function buildEncStructure(
   context: 'Encrypt0' | 'Encrypt',
   protectedHeaders: Uint8Array,
-  externalAad: Uint8Array,
+  externalAad: Uint8Array
 ): Uint8Array {
   return cborg.encode([context, protectedHeaders, externalAad])
 }

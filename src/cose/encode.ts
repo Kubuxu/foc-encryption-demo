@@ -1,11 +1,11 @@
 import * as cborg from 'cborg'
 import type { AppMetadata, Recipient } from '../types.ts'
 import {
-  CoseHeaderParam,
   COSE_HEADER_ALG,
   COSE_HEADER_IV,
-  COSE_HEADER_TYP,
   COSE_HEADER_KID,
+  COSE_HEADER_TYP,
+  CoseHeaderParam,
   FOC_ENVELOPE_TYPE,
 } from './headers.ts'
 
@@ -61,7 +61,7 @@ export function encodeCoseEncrypt(
   algorithmId: number,
   iv: Uint8Array,
   recipients: Recipient[],
-  options?: EncodeOptions,
+  options?: EncodeOptions
 ): Uint8Array {
   const protectedBytes = getProtectedHeaderBytes(algorithmId)
   const unprotectedMap = buildUnprotectedMap(iv, options)

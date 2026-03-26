@@ -9,7 +9,7 @@ export interface EncryptionScheme {
     key: CryptoKey,
     plaintext: Uint8Array,
     protectedHeaders: Uint8Array,
-    appMetadata?: AppMetadata,
+    appMetadata?: AppMetadata
   ): Promise<EncryptResult>
 
   decrypt(key: CryptoKey, ciphertext: Uint8Array, iv: Uint8Array, protectedHeaders: Uint8Array): Promise<Uint8Array>

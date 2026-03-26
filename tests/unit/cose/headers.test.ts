@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { CoseAlgorithm, CoseHeaderParam, COSE_HEADER_ALG, COSE_HEADER_IV, COSE_HEADER_TYP } from '../../../src/cose/headers.ts'
+import {
+  COSE_HEADER_ALG,
+  COSE_HEADER_IV,
+  COSE_HEADER_TYP,
+  CoseAlgorithm,
+  CoseHeaderParam,
+} from '../../../src/cose/headers.ts'
 
 describe('CoseAlgorithm', () => {
   it('has AES_256_GCM = 3', () => {

@@ -1,9 +1,9 @@
+import * as cborg from 'cborg'
 import { describe, expect, it } from 'vitest'
-import { Aes256Gcm } from '../../../src/schemes/aes-256-gcm.ts'
+import { COSE_HEADER_ALG } from '../../../src/cose/headers.ts'
 import { importAesGcmKey } from '../../../src/crypto.ts'
 import { AuthenticationError } from '../../../src/errors.ts'
-import * as cborg from 'cborg'
-import { COSE_HEADER_ALG } from '../../../src/cose/headers.ts'
+import { Aes256Gcm } from '../../../src/schemes/aes-256-gcm.ts'
 
 describe('Aes256Gcm scheme', () => {
   const scheme = new Aes256Gcm()
@@ -72,7 +72,7 @@ describe('Aes256Gcm scheme', () => {
 
     const result = await scheme.encrypt(key1, plaintext, protectedHeaders)
     await expect(scheme.decrypt(key2, result.ciphertext, result.iv, protectedHeaders)).rejects.toThrow(
-      AuthenticationError,
+      AuthenticationError
     )
   })
 
@@ -86,7 +86,7 @@ describe('Aes256Gcm scheme', () => {
     // Flip a byte in ciphertext
     result.ciphertext[0] ^= 0xff
     await expect(scheme.decrypt(key, result.ciphertext, result.iv, protectedHeaders)).rejects.toThrow(
-      AuthenticationError,
+      AuthenticationError
     )
   })
 })

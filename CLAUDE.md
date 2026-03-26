@@ -15,7 +15,7 @@ tests/
 
 ## Commands
 
-npm test && npm run lint
+npx biome check . && npm test && npm run lint
 
 ## Code Style
 

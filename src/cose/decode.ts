@@ -2,7 +2,7 @@ import * as cborg from 'cborg'
 import { MalformedEnvelopeError } from '../errors.ts'
 import type { RecipientInfo } from '../types.ts'
 import { COSE_HEADER_ALG, COSE_HEADER_IV, COSE_HEADER_KID, CoseHeaderParam } from './headers.ts'
-import { type CborTagged, COSE_TAG_ENCRYPT, COSE_TAG_ENCRYPT0, coseDecodeOptions } from './tags.ts'
+import { COSE_TAG_ENCRYPT, COSE_TAG_ENCRYPT0, type CborTagged, coseDecodeOptions } from './tags.ts'
 
 export interface DecodedEnvelope {
   tag: number

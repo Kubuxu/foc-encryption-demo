@@ -23,6 +23,6 @@
     }
   },
   "files": {
-    "ignore": ["dist/**", "node_modules/**", "coverage/**", "specs/**", ".specify/**"]
+    "ignore": [".zed/**", "dist/**", "node_modules/**", "coverage/**", "specs/**", ".specify/**"]
   }
 }

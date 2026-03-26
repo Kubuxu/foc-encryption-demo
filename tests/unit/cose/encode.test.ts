@@ -1,7 +1,13 @@
-import { describe, expect, it } from 'vitest'
 import * as cborg from 'cborg'
+import { describe, expect, it } from 'vitest'
 import { encodeCoseEncrypt0 } from '../../../src/cose/encode.ts'
-import { CoseAlgorithm, COSE_HEADER_ALG, COSE_HEADER_IV, COSE_HEADER_TYP, FOC_ENVELOPE_TYPE } from '../../../src/cose/headers.ts'
+import {
+  COSE_HEADER_ALG,
+  COSE_HEADER_IV,
+  COSE_HEADER_TYP,
+  CoseAlgorithm,
+  FOC_ENVELOPE_TYPE,
+} from '../../../src/cose/headers.ts'
 import { coseDecodeOptions } from '../../../src/cose/tags.ts'
 
 const decodeOpts = coseDecodeOptions
