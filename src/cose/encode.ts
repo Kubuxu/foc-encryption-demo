@@ -54,7 +54,7 @@ function buildUnprotectedMap(iv: Uint8Array, options?: EncodeOptions): Map<numbe
 export function encodeCoseEncrypt0(algorithmId: number, iv: Uint8Array, options?: EncodeOptions): Uint8Array {
   const protectedBytes = getProtectedHeaderBytes(algorithmId)
   const unprotectedMap = buildUnprotectedMap(iv, options)
-  return encodeCborTag(16, [protectedBytes, unprotectedMap, null])
+  return encodeCborTag(16, [protectedBytes, unprotectedMap, null]) // XXX: why are we using encodeCborTag? Why not encode all of these things togheater?
 }
 
 export function encodeCoseEncrypt(
