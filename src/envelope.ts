@@ -6,7 +6,7 @@ import { MalformedEnvelopeError, SchemeNotSeekableError, UnsupportedSchemeError 
 import { importAndZeroCek, validateCek } from './key-utils.js'
 import { Aes256Gcm } from './schemes/aes-256-gcm.js'
 import { ChunkedAes256GcmStream } from './schemes/chunked-aes-256-gcm.js'
-import type { EncryptionScheme } from './schemes/scheme.js'
+import type { DecryptMetadata, EncryptionScheme } from './schemes/scheme.js'
 import type {
   AppMetadata,
   BlobFetcher,
@@ -74,18 +74,8 @@ export async function decrypt(blob: Uint8Array, cek: CEKBytes): Promise<Uint8Arr
   const cekCopy = new Uint8Array(cek)
   const key = await importAndZeroCek(cekCopy)
 
-  if (scheme instanceof ChunkedAes256GcmStream) {
-    return scheme.decrypt(
-      key,
-      parsed.ciphertext,
-      envelope.iv,
-      envelope.protectedHeaders,
-      envelope.chunkSize,
-      envelope.chunkCount
-    )
-  }
-
-  return scheme.decrypt(key, parsed.ciphertext, envelope.iv, envelope.protectedHeaders)
+  const metadata: DecryptMetadata = { chunkSize: envelope.chunkSize, chunkCount: envelope.chunkCount }
+  return scheme.decrypt(key, parsed.ciphertext, envelope.iv, envelope.protectedHeaders, metadata)
 }
 
 export async function decryptRange(

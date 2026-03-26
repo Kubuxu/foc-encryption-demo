@@ -1,7 +1,7 @@
 import { buildEncStructure } from '../cose/structures.js'
 import { aesGcmDecrypt, aesGcmEncrypt, getRandomValues } from '../crypto.js'
 import { AuthenticationError } from '../errors.js'
-import type { EncryptResult, EncryptionScheme } from './scheme.js'
+import type { DecryptMetadata, EncryptResult, EncryptionScheme } from './scheme.js'
 
 const BASE_NONCE_LENGTH = 7
 const AES_GCM_TAG_LENGTH = 16
@@ -67,12 +67,11 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
     ciphertext: Uint8Array,
     iv: Uint8Array,
     protectedHeaders: Uint8Array,
-    chunkSize?: number,
-    chunkCount?: number
+    metadata?: DecryptMetadata
   ): Promise<Uint8Array> {
-    const effectiveChunkSize = chunkSize ?? this.chunkSize
+    const effectiveChunkSize = metadata?.chunkSize ?? this.chunkSize
     const ciphertextChunkSize = effectiveChunkSize + AES_GCM_TAG_LENGTH
-    const effectiveChunkCount = chunkCount ?? Math.ceil(ciphertext.length / ciphertextChunkSize)
+    const effectiveChunkCount = metadata?.chunkCount ?? Math.ceil(ciphertext.length / ciphertextChunkSize)
     if (effectiveChunkCount - 1 > MAX_CHUNK_INDEX) {
       throw new Error(`Chunk count ${effectiveChunkCount} exceeds the 4-byte counter maximum`)
     }

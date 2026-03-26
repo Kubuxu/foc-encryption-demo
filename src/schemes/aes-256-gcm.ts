@@ -1,7 +1,7 @@
 import { buildEncStructure } from '../cose/structures.js'
 import { aesGcmDecrypt, aesGcmEncrypt, getRandomValues } from '../crypto.js'
 import { AuthenticationError } from '../errors.js'
-import type { EncryptResult, EncryptionScheme } from './scheme.js'
+import type { DecryptMetadata, EncryptResult, EncryptionScheme } from './scheme.js'
 
 const AES_GCM_IV_LENGTH = 12
 const AES_GCM_TAG_LENGTH = 16
@@ -22,7 +22,8 @@ export class Aes256Gcm implements EncryptionScheme {
     key: CryptoKey,
     ciphertext: Uint8Array,
     iv: Uint8Array,
-    protectedHeaders: Uint8Array
+    protectedHeaders: Uint8Array,
+    _metadata?: DecryptMetadata
   ): Promise<Uint8Array> {
     const aad = buildEncStructure('Encrypt0', protectedHeaders, new Uint8Array(0))
     try {

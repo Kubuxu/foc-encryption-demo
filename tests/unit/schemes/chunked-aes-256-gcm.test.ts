@@ -51,14 +51,10 @@ describe('ChunkedAes256GcmStream scheme', () => {
     const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, -65793]]))
 
     const result = await scheme.encrypt(key, plaintext, protectedHeaders)
-    const decrypted = await scheme.decrypt(
-      key,
-      result.ciphertext,
-      result.iv,
-      protectedHeaders,
-      result.chunkSize,
-      result.chunkCount
-    )
+    const decrypted = await scheme.decrypt(key, result.ciphertext, result.iv, protectedHeaders, {
+      chunkSize: result.chunkSize,
+      chunkCount: result.chunkCount,
+    })
 
     expect(decrypted).toEqual(plaintext)
   })
@@ -74,7 +70,10 @@ describe('ChunkedAes256GcmStream scheme', () => {
 
     const result = await scheme.encrypt(key1, plaintext, protectedHeaders)
     await expect(
-      scheme.decrypt(key2, result.ciphertext, result.iv, protectedHeaders, result.chunkSize, result.chunkCount)
+      scheme.decrypt(key2, result.ciphertext, result.iv, protectedHeaders, {
+        chunkSize: result.chunkSize,
+        chunkCount: result.chunkCount,
+      })
     ).rejects.toThrow(AuthenticationError)
   })
 })
@@ -123,14 +122,10 @@ describe('ChunkedAes256GcmStream edge cases', () => {
     const result = await scheme.encrypt(key, plaintext, protectedHeaders)
     expect(result.chunkCount).toBe(1)
 
-    const decrypted = await scheme.decrypt(
-      key,
-      result.ciphertext,
-      result.iv,
-      protectedHeaders,
-      result.chunkSize,
-      result.chunkCount
-    )
+    const decrypted = await scheme.decrypt(key, result.ciphertext, result.iv, protectedHeaders, {
+      chunkSize: result.chunkSize,
+      chunkCount: result.chunkCount,
+    })
     expect(decrypted).toEqual(plaintext)
   })
 
@@ -146,14 +141,10 @@ describe('ChunkedAes256GcmStream edge cases', () => {
     // Each chunk is 1 byte plaintext + 16 byte tag = 17 bytes
     expect(result.ciphertext.length).toBe(3 * 17)
 
-    const decrypted = await scheme.decrypt(
-      key,
-      result.ciphertext,
-      result.iv,
-      protectedHeaders,
-      result.chunkSize,
-      result.chunkCount
-    )
+    const decrypted = await scheme.decrypt(key, result.ciphertext, result.iv, protectedHeaders, {
+      chunkSize: result.chunkSize,
+      chunkCount: result.chunkCount,
+    })
     expect(decrypted).toEqual(plaintext)
   })
 
@@ -164,7 +155,10 @@ describe('ChunkedAes256GcmStream edge cases', () => {
     const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, -65793]]))
 
     await expect(
-      scheme.decrypt(key, new Uint8Array(0), new Uint8Array(7), protectedHeaders, 16, MAX_CHUNK_INDEX + 2)
+      scheme.decrypt(key, new Uint8Array(0), new Uint8Array(7), protectedHeaders, {
+        chunkSize: 16,
+        chunkCount: MAX_CHUNK_INDEX + 2,
+      })
     ).rejects.toThrow(/exceeds the 4-byte counter maximum/)
   })
 
