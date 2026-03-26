@@ -2,8 +2,8 @@ import * as cborg from 'cborg'
 import { describe, expect, it } from 'vitest'
 import { COSE_HEADER_ALG, COSE_HEADER_TYP, CoseAlgorithm, FOC_ENVELOPE_TYPE } from '../../src/cose/headers.js'
 import { coseDecodeOptions } from '../../src/cose/tags.js'
-import { decrypt, encrypt } from '../../src/envelope.js'
-import { AuthenticationError } from '../../src/errors.js'
+import { decrypt, encrypt, parseEnvelope } from '../../src/envelope.js'
+import { AuthenticationError, UnsupportedSchemeError } from '../../src/errors.js'
 
 const decodeOpts = coseDecodeOptions
 
@@ -133,5 +133,68 @@ describe('decrypt integration', () => {
     tampered[tampered.length - 1] ^= 0xff
 
     await expect(decrypt(tampered, cek)).rejects.toThrow(AuthenticationError)
+  })
+})
+
+describe('edge cases', () => {
+  it('empty plaintext round-trip', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new Uint8Array(0)
+
+    const blob = await encrypt(plaintext, cek, { algorithm: CoseAlgorithm.AES_256_GCM })
+    const decrypted = await decrypt(blob, cek)
+    expect(decrypted).toEqual(plaintext)
+  })
+
+  it('single-byte plaintext round-trip', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new Uint8Array([0xff])
+
+    const blob = await encrypt(plaintext, cek, { algorithm: CoseAlgorithm.AES_256_GCM })
+    const decrypted = await decrypt(blob, cek)
+    expect(decrypted).toEqual(plaintext)
+  })
+
+  it('plaintext exactly chunk_size round-trip (chunked)', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new Uint8Array(64).fill(0xab)
+
+    const blob = await encrypt(plaintext, cek, {
+      algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM,
+      chunkSize: 64,
+    })
+    const decrypted = await decrypt(blob, cek)
+    expect(decrypted).toEqual(plaintext)
+  })
+
+  it('plaintext exactly N*chunk_size (no partial last chunk)', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new Uint8Array(128).fill(0xcd)
+
+    const blob = await encrypt(plaintext, cek, {
+      algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM,
+      chunkSize: 64,
+    })
+    const decrypted = await decrypt(blob, cek)
+    expect(decrypted).toEqual(plaintext)
+  })
+
+  it('app_metadata with CID round-trip', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const cid = new Uint8Array([0x01, 0x71, 0x12, 0x20, 0xab, 0xcd, 0xef])
+    const plaintext = new TextEncoder().encode('metadata test')
+
+    const blob = await encrypt(plaintext, cek, {
+      algorithm: CoseAlgorithm.AES_256_GCM,
+      appMetadata: { cid },
+    })
+
+    const metadata = parseEnvelope(blob)
+    expect(metadata.appMetadata).toBeDefined()
+    expect(new Uint8Array(metadata.appMetadata?.cid as Uint8Array)).toEqual(cid)
+
+    // Verify decryption still works
+    const decrypted = await decrypt(blob, cek)
+    expect(decrypted).toEqual(plaintext)
   })
 })

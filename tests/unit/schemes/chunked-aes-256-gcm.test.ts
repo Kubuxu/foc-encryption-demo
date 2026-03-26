@@ -111,3 +111,49 @@ describe('deriveChunkNonce', () => {
     expect(nonce[10]).toBe(0x04)
   })
 })
+
+describe('ChunkedAes256GcmStream edge cases', () => {
+  it('single-chunk file (smaller than chunk_size)', async () => {
+    const scheme = new ChunkedAes256GcmStream({ chunkSize: 256 })
+    const rawKey = crypto.getRandomValues(new Uint8Array(32))
+    const key = await importAesGcmKey(rawKey)
+    const plaintext = new Uint8Array(10).fill(0x42)
+    const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, -65793]]))
+
+    const result = await scheme.encrypt(key, plaintext, protectedHeaders)
+    expect(result.chunkCount).toBe(1)
+
+    const decrypted = await scheme.decrypt(
+      key,
+      result.ciphertext,
+      result.iv,
+      protectedHeaders,
+      result.chunkSize,
+      result.chunkCount
+    )
+    expect(decrypted).toEqual(plaintext)
+  })
+
+  it('chunk_size=1 (degenerate)', async () => {
+    const scheme = new ChunkedAes256GcmStream({ chunkSize: 1 })
+    const rawKey = crypto.getRandomValues(new Uint8Array(32))
+    const key = await importAesGcmKey(rawKey)
+    const plaintext = new Uint8Array([0xaa, 0xbb, 0xcc])
+    const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, -65793]]))
+
+    const result = await scheme.encrypt(key, plaintext, protectedHeaders)
+    expect(result.chunkCount).toBe(3)
+    // Each chunk is 1 byte plaintext + 16 byte tag = 17 bytes
+    expect(result.ciphertext.length).toBe(3 * 17)
+
+    const decrypted = await scheme.decrypt(
+      key,
+      result.ciphertext,
+      result.iv,
+      protectedHeaders,
+      result.chunkSize,
+      result.chunkCount
+    )
+    expect(decrypted).toEqual(plaintext)
+  })
+})
