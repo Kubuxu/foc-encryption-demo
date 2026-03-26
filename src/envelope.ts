@@ -2,12 +2,22 @@ import { assembleBlob, parseBlob } from './blob.js'
 import { decodeCoseEnvelope } from './cose/decode.js'
 import { encodeCoseEncrypt, encodeCoseEncrypt0, getProtectedHeaderBytes } from './cose/encode.js'
 import { CoseAlgorithm } from './cose/headers.js'
-import { SchemeNotSeekableError, UnsupportedSchemeError } from './errors.js'
+import { MalformedEnvelopeError, SchemeNotSeekableError, UnsupportedSchemeError } from './errors.js'
 import { importAndZeroCek, validateCek } from './key-utils.js'
 import { Aes256Gcm } from './schemes/aes-256-gcm.js'
 import { ChunkedAes256GcmStream } from './schemes/chunked-aes-256-gcm.js'
 import type { EncryptionScheme } from './schemes/scheme.js'
-import type { BlobFetcher, ByteRange, CEKBytes, ChunkedEncryptOptions, EncryptOptions, Recipient } from './types.js'
+import type {
+  AppMetadata,
+  BlobFetcher,
+  ByteRange,
+  CEKBytes,
+  ChunkedEncryptOptions,
+  CoseAlgorithmId,
+  EncryptOptions,
+  EnvelopeMetadata,
+  Recipient,
+} from './types.js'
 
 function getScheme(algorithmId: number, chunkSize?: number): EncryptionScheme {
   switch (algorithmId) {
@@ -158,4 +168,32 @@ export async function decryptRange(
     envelope.chunkSize,
     envelope.chunkCount
   )
+}
+
+export function parseEnvelope(blob: Uint8Array): EnvelopeMetadata {
+  let envelope: ReturnType<typeof decodeCoseEnvelope>
+  try {
+    envelope = decodeCoseEnvelope(blob)
+  } catch (e) {
+    if (e instanceof MalformedEnvelopeError) throw e
+    throw new MalformedEnvelopeError('Failed to parse envelope')
+  }
+
+  const seekable = envelope.algorithm === CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM
+
+  let appMetadata: AppMetadata | undefined
+  if (envelope.appMetadata) {
+    appMetadata = Object.fromEntries(envelope.appMetadata) as AppMetadata
+  }
+
+  return {
+    algorithm: envelope.algorithm as CoseAlgorithmId,
+    seekable,
+    iv: envelope.iv,
+    chunkSize: envelope.chunkSize,
+    chunkCount: envelope.chunkCount,
+    appMetadata,
+    recipients: envelope.recipients,
+    envelopeSize: envelope.envelopeSize,
+  }
 }

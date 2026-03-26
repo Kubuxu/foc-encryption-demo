@@ -1,4 +1,4 @@
-export { decrypt, decryptRange, encrypt } from './envelope.js'
+export { decrypt, decryptRange, encrypt, parseEnvelope } from './envelope.js'
 export { CoseAlgorithm, CoseHeaderParam } from './cose/headers.js'
 export type {
   CEKBytes,
