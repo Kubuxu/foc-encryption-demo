@@ -27,6 +27,7 @@ export interface EnvelopeMetadata {
   algorithm: CoseAlgorithmId
   seekable: boolean
   iv: Uint8Array
+  protectedHeaders: Uint8Array
   chunkSize?: number
   chunkCount?: number
   appMetadata?: AppMetadata

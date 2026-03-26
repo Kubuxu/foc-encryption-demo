@@ -23,7 +23,5 @@ TypeScript 5.9+, ESM-only (`"type": "module"`): Follow standard conventions
 
 ## Recent Changes
 
-- 001-encryption-envelope-lib: Added TypeScript 5.9+, ESM-only (`"type": "module"`) + `cborg` (CBOR encoding/decoding), Web Crypto API (AES-256-GCM)
-
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

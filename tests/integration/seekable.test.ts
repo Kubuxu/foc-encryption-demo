@@ -44,7 +44,9 @@ describe('seekable encryption (chunked AES-256-GCM STREAM)', () => {
     })
 
     // Decrypt bytes 64-127 (second chunk)
-    const range = await decryptRange(blob, cek, { offset: 64, length: 64 })
+    const meta = parseEnvelope(blob)
+    const fetcher = makeBlobFetcher(blob)
+    const range = await decryptRange(fetcher, meta, cek, { offset: 64, length: 64 })
     expect(range).toEqual(plaintext.slice(64, 128))
   })
 
@@ -59,7 +61,9 @@ describe('seekable encryption (chunked AES-256-GCM STREAM)', () => {
     })
 
     // Decrypt bytes 32-95 (spans chunks 0 and 1)
-    const range = await decryptRange(blob, cek, { offset: 32, length: 64 })
+    const meta = parseEnvelope(blob)
+    const fetcher = makeBlobFetcher(blob)
+    const range = await decryptRange(fetcher, meta, cek, { offset: 32, length: 64 })
     expect(range).toEqual(plaintext.slice(32, 96))
   })
 
@@ -73,7 +77,9 @@ describe('seekable encryption (chunked AES-256-GCM STREAM)', () => {
       chunkSize: 64,
     })
 
-    const range = await decryptRange(blob, cek, { offset: 0, length: 32 })
+    const meta = parseEnvelope(blob)
+    const fetcher = makeBlobFetcher(blob)
+    const range = await decryptRange(fetcher, meta, cek, { offset: 0, length: 32 })
     expect(range).toEqual(plaintext.slice(0, 32))
   })
 
@@ -87,7 +93,9 @@ describe('seekable encryption (chunked AES-256-GCM STREAM)', () => {
       chunkSize: 64,
     })
 
-    const range = await decryptRange(blob, cek, { offset: 192, length: 64 })
+    const meta = parseEnvelope(blob)
+    const fetcher = makeBlobFetcher(blob)
+    const range = await decryptRange(fetcher, meta, cek, { offset: 192, length: 64 })
     expect(range).toEqual(plaintext.slice(192, 256))
   })
 
@@ -96,8 +104,10 @@ describe('seekable encryption (chunked AES-256-GCM STREAM)', () => {
     const plaintext = new TextEncoder().encode('not seekable')
 
     const blob = await encrypt(plaintext, cek, { algorithm: CoseAlgorithm.AES_256_GCM })
+    const meta = parseEnvelope(blob)
+    const fetcher = makeBlobFetcher(blob)
 
-    await expect(decryptRange(blob, cek, { offset: 0, length: 5 })).rejects.toThrow(SchemeNotSeekableError)
+    await expect(decryptRange(fetcher, meta, cek, { offset: 0, length: 5 })).rejects.toThrow(SchemeNotSeekableError)
   })
 })
 
@@ -111,9 +121,10 @@ describe('BlobFetcher range decryption', () => {
       algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM,
       chunkSize: 64,
     })
+    const meta = parseEnvelope(blob)
     const fetcher = makeBlobFetcher(blob)
 
-    const range = await decryptRange(fetcher, cek, { offset: 0, length: 32 })
+    const range = await decryptRange(fetcher, meta, cek, { offset: 0, length: 32 })
     expect(range).toEqual(plaintext.slice(0, 32))
   })
 
@@ -126,10 +137,11 @@ describe('BlobFetcher range decryption', () => {
       algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM,
       chunkSize: 64,
     })
+    const meta = parseEnvelope(blob)
     const fetcher = makeBlobFetcher(blob)
 
     // Chunk 2 (bytes 128-191) — this is the key test for issue 1
-    const range = await decryptRange(fetcher, cek, { offset: 128, length: 64 })
+    const range = await decryptRange(fetcher, meta, cek, { offset: 128, length: 64 })
     expect(range).toEqual(plaintext.slice(128, 192))
   })
 
@@ -142,10 +154,11 @@ describe('BlobFetcher range decryption', () => {
       algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM,
       chunkSize: 64,
     })
+    const meta = parseEnvelope(blob)
     const fetcher = makeBlobFetcher(blob)
 
     // Spans chunks 1 and 2
-    const range = await decryptRange(fetcher, cek, { offset: 80, length: 64 })
+    const range = await decryptRange(fetcher, meta, cek, { offset: 80, length: 64 })
     expect(range).toEqual(plaintext.slice(80, 144))
   })
 
@@ -158,13 +171,14 @@ describe('BlobFetcher range decryption', () => {
       algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM,
       chunkSize: 64,
     })
+    const meta = parseEnvelope(blob)
     const fetcher = makeBlobFetcher(blob)
 
-    const range = await decryptRange(fetcher, cek, { offset: 192, length: 64 })
+    const range = await decryptRange(fetcher, meta, cek, { offset: 192, length: 64 })
     expect(range).toEqual(plaintext.slice(192, 256))
   })
 
-  it('BlobFetcher: matches Uint8Array path for all ranges', async () => {
+  it('BlobFetcher: decrypts all ranges correctly', async () => {
     const cek = crypto.getRandomValues(new Uint8Array(32))
     const plaintext = new Uint8Array(320)
     for (let i = 0; i < 320; i++) plaintext[i] = i & 0xff
@@ -173,9 +187,9 @@ describe('BlobFetcher range decryption', () => {
       algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM,
       chunkSize: 64,
     })
+    const meta = parseEnvelope(blob)
     const fetcher = makeBlobFetcher(blob)
 
-    // Test several ranges and compare BlobFetcher vs Uint8Array paths
     const ranges = [
       { offset: 0, length: 64 },
       { offset: 64, length: 64 },
@@ -183,10 +197,90 @@ describe('BlobFetcher range decryption', () => {
       { offset: 200, length: 100 },
       { offset: 0, length: 320 },
     ]
-    for (const range of ranges) {
-      const fromBlob = await decryptRange(blob, cek, range)
-      const fromFetcher = await decryptRange(fetcher, cek, range)
-      expect(fromFetcher).toEqual(fromBlob)
+    for (const r of ranges) {
+      const result = await decryptRange(fetcher, meta, cek, r)
+      expect(result).toEqual(plaintext.slice(r.offset, r.offset + r.length))
     }
+  })
+})
+
+describe('new API (pre-parsed metadata)', () => {
+  it('T001: parseEnvelope returns protectedHeaders field', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new TextEncoder().encode('hello')
+    const blob = await encrypt(plaintext, cek, { algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM })
+    const meta = parseEnvelope(blob)
+    expect(meta.protectedHeaders).toBeInstanceOf(Uint8Array)
+    expect(meta.protectedHeaders.length).toBeGreaterThan(0)
+  })
+
+  it('T002: parseEnvelope(BlobFetcher) async path calls fetchEnvelope once and returns correct metadata', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new TextEncoder().encode('hello')
+    const blob = await encrypt(plaintext, cek, { algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM })
+    const syncMeta = parseEnvelope(blob)
+    let fetchCount = 0
+    const fetcher: BlobFetcher = {
+      async fetchEnvelope() {
+        fetchCount++
+        return blob.slice(0, syncMeta.envelopeSize)
+      },
+      async fetchRange(offset, length) {
+        return blob.slice(offset, offset + length)
+      },
+    }
+    const asyncMeta = await parseEnvelope(fetcher)
+    expect(fetchCount).toBe(1)
+    expect(asyncMeta.seekable).toBe(true)
+    expect(asyncMeta.algorithm).toBe(syncMeta.algorithm)
+    expect(asyncMeta.protectedHeaders).toBeInstanceOf(Uint8Array)
+  })
+
+  it('T003: decryptRange(fetcher, metadata, cek, range) decrypts correctly', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new Uint8Array(256)
+    for (let i = 0; i < 256; i++) plaintext[i] = i & 0xff
+    const blob = await encrypt(plaintext, cek, {
+      algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM,
+      chunkSize: 64,
+    })
+    const meta = parseEnvelope(blob)
+    const fetcher = makeBlobFetcher(blob)
+    const result = await decryptRange(fetcher, meta, cek, { offset: 64, length: 64 })
+    expect(result).toEqual(plaintext.slice(64, 128))
+  })
+
+  it('T004: envelope is never fetched when decryptRange is called with pre-parsed metadata', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new Uint8Array(256)
+    for (let i = 0; i < 256; i++) plaintext[i] = i & 0xff
+    const blob = await encrypt(plaintext, cek, {
+      algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM,
+      chunkSize: 64,
+    })
+    const meta = parseEnvelope(blob)
+    let envelopeFetchCount = 0
+    const countingFetcher: BlobFetcher = {
+      async fetchEnvelope() {
+        envelopeFetchCount++
+        return blob.slice(0, meta.envelopeSize)
+      },
+      async fetchRange(offset, length) {
+        return blob.slice(offset, offset + length)
+      },
+    }
+    await decryptRange(countingFetcher, meta, cek, { offset: 0, length: 32 })
+    await decryptRange(countingFetcher, meta, cek, { offset: 64, length: 32 })
+    await decryptRange(countingFetcher, meta, cek, { offset: 128, length: 64 })
+    expect(envelopeFetchCount).toBe(0)
+  })
+
+  it('T005: decryptRange throws SchemeNotSeekableError when metadata has non-seekable algorithm', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new TextEncoder().encode('not seekable')
+    const blob = await encrypt(plaintext, cek, { algorithm: CoseAlgorithm.AES_256_GCM })
+    const meta = parseEnvelope(blob)
+    const fetcher = makeBlobFetcher(blob)
+    await expect(decryptRange(fetcher, meta, cek, { offset: 0, length: 5 })).rejects.toThrow(SchemeNotSeekableError)
   })
 })
