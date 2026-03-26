@@ -40,13 +40,52 @@ export async function uploadFile(flags: UploadFlags): Promise<void> {
     appMetadata: hasMetadata ? appMetadata : undefined,
   })
 
+  const PROGRESS_CHUNK_SIZE = 1024 * 1024 // report every 1 MiB
+  let lastReportedBytes = 0
+
   const synapse = createSynapseClient({ privateKey })
+  console.log('Uploading to Filecoin Calibration...')
   const result = await synapse.storage.upload(blob, {
     callbacks: {
-      onProgress: (bytes) => process.stderr.write(`\rUploading... ${formatSize(bytes)}`),
+      onProviderSelected: (provider) => {
+        console.log(`  Selected SP ${provider.id} (${provider.serviceProvider})`)
+      },
+      onDataSetResolved: (info) => {
+        console.log(`  Data set: ${info.dataSetId}`)
+      },
+      onProgress: (bytesUploaded) => {
+        if (bytesUploaded - lastReportedBytes >= PROGRESS_CHUNK_SIZE || bytesUploaded === blob.length) {
+          const pct = blob.length > 0 ? ` (${((bytesUploaded / blob.length) * 100).toFixed(1)}%)` : ''
+          console.log(`  Upload progress: ${formatSize(bytesUploaded)}${pct}`)
+          lastReportedBytes = bytesUploaded
+        }
+      },
+      onStored: (providerId, pieceCid) => {
+        console.log(`  Stored on SP ${providerId}: ${pieceCid}`)
+      },
+      onPiecesAdded: (transaction, providerId, pieces) => {
+        console.log(`  Pieces committed on SP ${providerId}, tx: ${transaction}`)
+        for (const { pieceCid } of pieces) {
+          console.log(`    ${pieceCid}`)
+        }
+      },
+      onPiecesConfirmed: (dataSetId, providerId, pieces) => {
+        console.log(`  Data set ${dataSetId} confirmed on SP ${providerId}`)
+        for (const { pieceCid, pieceId } of pieces) {
+          console.log(`    ${pieceCid} -> pieceId ${pieceId}`)
+        }
+      },
+      onPullProgress: (providerId, pieceCid, status) => {
+        console.log(`  Pulling to SP ${providerId}: ${pieceCid} (${status})`)
+      },
+      onCopyComplete: (providerId, pieceCid) => {
+        console.log(`  Copied to SP ${providerId}: ${pieceCid}`)
+      },
+      onCopyFailed: (providerId, pieceCid, error) => {
+        console.log(`  Copy failed on SP ${providerId}: ${pieceCid} - ${error.message}`)
+      },
     },
   })
-  process.stderr.write('\r\x1b[K')
 
   const algorithmName = isChunked ? 'Chunked-AES-256-GCM-STREAM' : 'AES-256-GCM'
   console.log(`PieceCID:       ${result.pieceCid.toString()}`)
