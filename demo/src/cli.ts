@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { cli, command } from 'cleye'
 import { encryptFile } from './commands/encrypt.js'
+import { decryptFile } from './commands/decrypt.js'
 
 const encryptCommand = command(
   {
@@ -67,9 +68,18 @@ const decryptCommand = command(
       },
     },
   },
-  () => {
-    console.error('not implemented')
-    process.exit(1)
+  async (argv) => {
+    try {
+      await decryptFile({
+        file: argv._.file,
+        key: argv.flags.key,
+        password: argv.flags.password,
+        output: argv.flags.output,
+      })
+    } catch (err) {
+      console.error(`Error: ${err instanceof Error ? err.message : String(err)}`)
+      process.exit(1)
+    }
   }
 )
 

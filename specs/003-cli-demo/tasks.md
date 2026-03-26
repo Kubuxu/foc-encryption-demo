@@ -75,13 +75,13 @@
 
 ### Tests for US4
 
-- [ ] T017 [US4] Extend integration test in `demo/tests/integration/encrypt-decrypt.test.ts` — full round-trip: encrypt then decrypt with hex key, verify plaintext matches; encrypt with password then decrypt with same password, verify match; wrong password returns actionable error
+- [X] T017 [US4] Extend integration test in `demo/tests/integration/encrypt-decrypt.test.ts` — full round-trip: encrypt then decrypt with hex key, verify plaintext matches; encrypt with password then decrypt with same password, verify match; wrong password returns actionable error
 
 ### Implementation for US4
 
-- [ ] T018 [US4] Implement `demo/src/commands/decrypt.ts` — read blob, parse envelope to extract appMetadata (PBKDF2 salt if present), resolve key (using salt from envelope for password mode), call `foc-encryption.decrypt()`, write plaintext to output
-- [ ] T019 [US4] Wire decrypt command in `demo/src/cli.ts`
-- [ ] T020 [US4] Verify integration tests pass; manually test encrypt→decrypt round-trip
+- [X] T018 [US4] Implement `demo/src/commands/decrypt.ts` — read blob, parse envelope to extract appMetadata (PBKDF2 salt if present), resolve key (using salt from envelope for password mode), call `foc-encryption.decrypt()`, write plaintext to output
+- [X] T019 [US4] Wire decrypt command in `demo/src/cli.ts`
+- [X] T020 [US4] Verify integration tests pass; manually test encrypt→decrypt round-trip
 
 **Checkpoint**: Local encrypt→decrypt round-trip works. Both hex key and password modes. Error messages for wrong key are actionable.
 

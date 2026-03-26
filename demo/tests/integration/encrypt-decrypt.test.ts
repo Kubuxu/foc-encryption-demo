@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { parseEnvelope } from 'foc-encryption'
 import { encryptFile } from '../../src/commands/encrypt.js'
+import { decryptFile } from '../../src/commands/decrypt.js'
 
 describe('encrypt command', () => {
   let tempDir: string
@@ -67,5 +68,70 @@ describe('encrypt command', () => {
     const blob = new Uint8Array(await readFile(`${inputPath}.enc`))
     const meta = parseEnvelope(blob)
     expect(meta).toBeDefined()
+  })
+})
+
+describe('decrypt command', () => {
+  let tempDir: string
+
+  beforeEach(async () => {
+    tempDir = await mkdtemp(join(tmpdir(), 'foc-test-'))
+  })
+
+  afterEach(async () => {
+    await rm(tempDir, { recursive: true })
+  })
+
+  it('full round-trip with hex key: encrypt then decrypt produces identical plaintext', async () => {
+    const original = 'Hello, FOC round-trip! The plaintext must survive encryption and decryption.'
+    const inputPath = join(tempDir, 'input.txt')
+    const encPath = join(tempDir, 'input.txt.enc')
+    const decPath = join(tempDir, 'decrypted.txt')
+    await writeFile(inputPath, original)
+
+    await encryptFile({ file: inputPath, key: 'cc'.repeat(32), output: encPath })
+    await decryptFile({ file: encPath, key: 'cc'.repeat(32), output: decPath })
+
+    const result = await readFile(decPath, 'utf8')
+    expect(result).toBe(original)
+  })
+
+  it('full round-trip with password: encrypt then decrypt produces identical plaintext', async () => {
+    const original = 'Password round-trip test content.'
+    const inputPath = join(tempDir, 'pw-input.txt')
+    const encPath = join(tempDir, 'pw-input.txt.enc')
+    const decPath = join(tempDir, 'pw-decrypted.txt')
+    await writeFile(inputPath, original)
+
+    await encryptFile({ file: inputPath, password: 'correcthorsebatterystaple', output: encPath })
+    await decryptFile({ file: encPath, password: 'correcthorsebatterystaple', output: decPath })
+
+    const result = await readFile(decPath, 'utf8')
+    expect(result).toBe(original)
+  })
+
+  it('wrong password returns an actionable error', async () => {
+    const inputPath = join(tempDir, 'secret.txt')
+    const encPath = join(tempDir, 'secret.txt.enc')
+    await writeFile(inputPath, 'super secret data')
+
+    await encryptFile({ file: inputPath, password: 'rightpassword', output: encPath })
+
+    await expect(
+      decryptFile({ file: encPath, password: 'wrongpassword', output: join(tempDir, 'out.txt') })
+    ).rejects.toThrow()
+  })
+
+  it('defaults output path by stripping .enc suffix', async () => {
+    const original = 'default output path test'
+    const inputPath = join(tempDir, 'file.txt')
+    const encPath = join(tempDir, 'file.txt.enc')
+    await writeFile(inputPath, original)
+
+    await encryptFile({ file: inputPath, key: 'dd'.repeat(32), output: encPath })
+    await decryptFile({ file: encPath, key: 'dd'.repeat(32) })
+
+    const result = await readFile(join(tempDir, 'file.txt.dec'), 'utf8')
+    expect(result).toBe(original)
   })
 })
