@@ -3,6 +3,7 @@ import { cli, command } from 'cleye'
 import { encryptFile } from './commands/encrypt.js'
 import { decryptFile } from './commands/decrypt.js'
 import { uploadFile } from './commands/upload.js'
+import { downloadFile } from './commands/download.js'
 
 const encryptCommand = command(
   {
@@ -152,9 +153,19 @@ const downloadCommand = command(
       },
     },
   },
-  () => {
-    console.error('not implemented')
-    process.exit(1)
+  async (argv) => {
+    try {
+      await downloadFile({
+        locator: argv._.locator,
+        key: argv.flags.key,
+        password: argv.flags.password,
+        output: argv.flags.output ?? (() => { throw new Error('--output is required') })(),
+        privateKey: argv.flags.privateKey,
+      })
+    } catch (err) {
+      console.error(`Error: ${err instanceof Error ? err.message : String(err)}`)
+      process.exit(1)
+    }
   }
 )
 

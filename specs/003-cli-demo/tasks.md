@@ -115,13 +115,13 @@
 
 ### Tests for US2
 
-- [ ] T025 [US2] Extend integration test in `demo/tests/integration/upload-download.test.ts` — mock download: upload a blob then download by mocked URL, verify plaintext matches; test URL locator path (no wallet); test PieceCID locator path (with wallet)
+- [X] T025 [US2] Extend integration test in `demo/tests/integration/upload-download.test.ts` — mock download: upload a blob then download by mocked URL, verify plaintext matches; test URL locator path (no wallet); test PieceCID locator path (with wallet)
 
 ### Implementation for US2
 
-- [ ] T026 [US2] Implement `demo/src/commands/download.ts` — parse locator, resolve to URL (via synapse if PieceCID), fetch blob, parse envelope for salt, resolve key, decrypt, write to output file
-- [ ] T027 [US2] Wire download command in `demo/src/cli.ts`
-- [ ] T028 [US2] Verify integration tests pass
+- [X] T026 [US2] Implement `demo/src/commands/download.ts` — parse locator, resolve to URL (via synapse if PieceCID), fetch blob, parse envelope for salt, resolve key, decrypt, write to output file
+- [X] T027 [US2] Wire download command in `demo/src/cli.ts`
+- [X] T028 [US2] Verify integration tests pass
 
 **Checkpoint**: Download+decrypt works for both URL and PieceCID locators. Round-trip upload→download verified with mocks.
 

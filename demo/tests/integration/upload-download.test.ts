@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { writeFile, mkdtemp, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { parseEnvelope } from 'foc-encryption'
+import { encrypt, parseEnvelope, CoseAlgorithm } from 'foc-encryption'
 
 vi.mock('../../src/synapse.js', () => ({
   createSynapseClient: vi.fn(),
@@ -10,6 +10,7 @@ vi.mock('../../src/synapse.js', () => ({
 }))
 
 import { uploadFile } from '../../src/commands/upload.js'
+import { downloadFile } from '../../src/commands/download.js'
 import { createSynapseClient } from '../../src/synapse.js'
 
 describe('upload command', () => {
@@ -143,5 +144,110 @@ describe('upload command', () => {
     const meta = parseEnvelope(capturedBlob!)
     expect(meta.appMetadata).toBeDefined()
     expect(meta.appMetadata!.pbkdf2_salt).toBeInstanceOf(Uint8Array)
+  })
+})
+
+describe('download command', () => {
+  let tempDir: string
+
+  const hexKey = 'aa'.repeat(32)
+  const plaintextContent = 'Hello, download test! Round-trip content.'
+
+  beforeEach(async () => {
+    tempDir = await mkdtemp(join(tmpdir(), 'foc-download-test-'))
+    vi.clearAllMocks()
+  })
+
+  afterEach(async () => {
+    await rm(tempDir, { recursive: true })
+    vi.restoreAllMocks()
+  })
+
+  it('URL locator: downloads and decrypts blob — no wallet needed', async () => {
+    // Pre-encrypt content
+    const keyBytes = new Uint8Array(Buffer.from(hexKey, 'hex'))
+    const plaintext = new TextEncoder().encode(plaintextContent)
+    const blob = await encrypt(plaintext, keyBytes, { algorithm: CoseAlgorithm.AES_256_GCM })
+
+    const fakeUrl = 'https://retrieval.example.com/piece/testcid'
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(blob, { status: 200 })
+    )
+
+    const outputPath = join(tempDir, 'downloaded.txt')
+    await downloadFile({
+      locator: fakeUrl,
+      key: hexKey,
+      output: outputPath,
+    })
+
+    const downloaded = await import('node:fs/promises').then((m) => m.readFile(outputPath))
+    expect(new TextDecoder().decode(downloaded)).toBe(plaintextContent)
+
+    // URL locator must NOT create a synapse client
+    expect(createSynapseClient).not.toHaveBeenCalled()
+  })
+
+  it('URL locator with password: uses salt from envelope for decryption', async () => {
+    // Encrypt with password-derived key (embed salt in metadata)
+    const salt = crypto.getRandomValues(new Uint8Array(16))
+    const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode('secret'), 'PBKDF2', false, ['deriveBits'])
+    const keyBits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 600_000, hash: 'SHA-256' }, keyMaterial, 256)
+    const keyBytes = new Uint8Array(keyBits)
+
+    const plaintext = new TextEncoder().encode('password round-trip test')
+    const blob = await encrypt(plaintext, keyBytes, {
+      algorithm: CoseAlgorithm.AES_256_GCM,
+      appMetadata: { pbkdf2_salt: salt, pbkdf2_iterations: 600_000, pbkdf2_hash: 'SHA-256' },
+    })
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(blob, { status: 200 })
+    )
+
+    const outputPath = join(tempDir, 'pw-downloaded.txt')
+    await downloadFile({
+      locator: 'https://example.com/blob',
+      password: 'secret',
+      output: outputPath,
+    })
+
+    const downloaded = await import('node:fs/promises').then((m) => m.readFile(outputPath))
+    expect(new TextDecoder().decode(downloaded)).toBe('password round-trip test')
+  })
+
+  it('PieceCID locator: resolves URL via synapse then downloads and decrypts', async () => {
+    const keyBytes = new Uint8Array(Buffer.from(hexKey, 'hex'))
+    const plaintext = new TextEncoder().encode('piececid round-trip content')
+    const blob = await encrypt(plaintext, keyBytes, { algorithm: CoseAlgorithm.AES_256_GCM })
+
+    const fakeRetrievalUrl = 'https://retrieval.example.com/piece/baga123'
+
+    vi.mocked(createSynapseClient).mockReturnValue({
+      storage: {
+        createContext: vi.fn().mockResolvedValue({
+          getPieceUrl: vi.fn().mockReturnValue(fakeRetrievalUrl),
+        }),
+      },
+    } as any)
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(blob, { status: 200 })
+    )
+
+    const outputPath = join(tempDir, 'cid-downloaded.txt')
+    await downloadFile({
+      locator: 'baga6ea4seaqtest',
+      key: hexKey,
+      privateKey: '0x' + 'ab'.repeat(32),
+      output: outputPath,
+    })
+
+    const downloaded = await import('node:fs/promises').then((m) => m.readFile(outputPath))
+    expect(new TextDecoder().decode(downloaded)).toBe('piececid round-trip content')
+    expect(createSynapseClient).toHaveBeenCalledWith(
+      expect.objectContaining({ privateKey: '0x' + 'ab'.repeat(32) })
+    )
   })
 })
