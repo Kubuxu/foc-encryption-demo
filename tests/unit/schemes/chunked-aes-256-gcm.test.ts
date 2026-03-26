@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { COSE_HEADER_ALG } from '../../../src/cose/headers.js'
 import { importAesGcmKey } from '../../../src/crypto.js'
 import { AuthenticationError } from '../../../src/errors.js'
-import { ChunkedAes256GcmStream, deriveChunkNonce } from '../../../src/schemes/chunked-aes-256-gcm.js'
+import { ChunkedAes256GcmStream, MAX_CHUNK_INDEX, deriveChunkNonce } from '../../../src/schemes/chunked-aes-256-gcm.js'
 
 describe('ChunkedAes256GcmStream scheme', () => {
   it('has correct algorithm properties', () => {
@@ -155,5 +155,9 @@ describe('ChunkedAes256GcmStream edge cases', () => {
       result.chunkCount
     )
     expect(decrypted).toEqual(plaintext)
+  })
+
+  it('MAX_CHUNK_INDEX is 2^32 - 1', () => {
+    expect(MAX_CHUNK_INDEX).toBe(0xffffffff)
   })
 })

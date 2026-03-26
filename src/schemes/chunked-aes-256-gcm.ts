@@ -6,6 +6,7 @@ import type { EncryptResult, EncryptionScheme } from './scheme.js'
 const BASE_NONCE_LENGTH = 7
 const AES_GCM_TAG_LENGTH = 16
 const DEFAULT_CHUNK_SIZE = 262144 // 256 KiB
+const MAX_CHUNK_INDEX = 0xffffffff // 4-byte counter max
 
 export interface ChunkedEncryptParams {
   chunkSize?: number
@@ -25,6 +26,11 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
   async encrypt(key: CryptoKey, plaintext: Uint8Array, protectedHeaders: Uint8Array): Promise<EncryptResult> {
     const baseNonce = getRandomValues(BASE_NONCE_LENGTH)
     const chunkCount = Math.max(1, Math.ceil(plaintext.length / this.chunkSize))
+    if (chunkCount - 1 > MAX_CHUNK_INDEX) {
+      throw new Error(
+        `Plaintext too large: ${chunkCount} chunks exceeds the 4-byte counter maximum (${MAX_CHUNK_INDEX + 1})`
+      )
+    }
 
     const chunks: Uint8Array[] = []
     for (let i = 0; i < chunkCount; i++) {
@@ -67,6 +73,9 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
     const effectiveChunkSize = chunkSize ?? this.chunkSize
     const ciphertextChunkSize = effectiveChunkSize + AES_GCM_TAG_LENGTH
     const effectiveChunkCount = chunkCount ?? Math.ceil(ciphertext.length / ciphertextChunkSize)
+    if (effectiveChunkCount - 1 > MAX_CHUNK_INDEX) {
+      throw new Error(`Chunk count ${effectiveChunkCount} exceeds the 4-byte counter maximum`)
+    }
 
     const plaintextChunks: Uint8Array[] = []
     for (let i = 0; i < effectiveChunkCount; i++) {
@@ -111,6 +120,9 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
     const effectiveChunkCount = chunkCount ?? Math.ceil(ciphertext.length / ciphertextChunkSize)
 
     const firstChunk = Math.floor(plaintextOffset / effectiveChunkSize)
+    if (effectiveChunkCount - 1 > MAX_CHUNK_INDEX) {
+      throw new Error(`Chunk count ${effectiveChunkCount} exceeds the 4-byte counter maximum`)
+    }
     const lastChunk = Math.min(
       Math.floor((plaintextOffset + plaintextLength - 1) / effectiveChunkSize),
       effectiveChunkCount - 1
@@ -167,4 +179,4 @@ function deriveChunkNonce(baseNonce: Uint8Array, chunkIndex: number, isLast: boo
   return nonce
 }
 
-export { DEFAULT_CHUNK_SIZE, AES_GCM_TAG_LENGTH, BASE_NONCE_LENGTH, deriveChunkNonce }
+export { DEFAULT_CHUNK_SIZE, AES_GCM_TAG_LENGTH, BASE_NONCE_LENGTH, MAX_CHUNK_INDEX, deriveChunkNonce }
