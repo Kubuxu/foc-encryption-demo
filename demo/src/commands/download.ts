@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises'
 import { decrypt, parseEnvelope } from 'foc-encryption'
 import { parseKeySource, deriveKey } from '../key.js'
-import { parseLocator, resolveUrl } from '../locator.js'
+import { parseLocator, fetchBlob } from '../locator.js'
 import { createSynapseClient } from '../synapse.js'
 import { formatSize } from '../util.js'
 
@@ -27,13 +27,7 @@ export async function downloadFile(flags: DownloadFlags): Promise<void> {
     synapse = createSynapseClient({ privateKey })
   }
 
-  const url = await resolveUrl(locator, synapse)
-
-  const resp = await fetch(url)
-  if (!resp.ok) {
-    throw new Error(`Failed to fetch blob: HTTP ${resp.status} ${resp.statusText}`)
-  }
-  const blob = new Uint8Array(await resp.arrayBuffer())
+  const blob = await fetchBlob(locator, synapse)
 
   const meta = parseEnvelope(blob)
   const keySource = parseKeySource({ key: flags.key, password: flags.password })
