@@ -217,24 +217,16 @@ describe('download command', () => {
     expect(new TextDecoder().decode(downloaded)).toBe('password round-trip test')
   })
 
-  it('PieceCID locator: resolves URL via synapse then downloads and decrypts', async () => {
+  it('PieceCID locator: downloads via synapse storage.download and decrypts', async () => {
     const keyBytes = new Uint8Array(Buffer.from(hexKey, 'hex'))
     const plaintext = new TextEncoder().encode('piececid round-trip content')
     const blob = await encrypt(plaintext, keyBytes, { algorithm: CoseAlgorithm.AES_256_GCM })
 
-    const fakeRetrievalUrl = 'https://retrieval.example.com/piece/baga123'
-
     vi.mocked(createSynapseClient).mockReturnValue({
       storage: {
-        createContext: vi.fn().mockResolvedValue({
-          getPieceUrl: vi.fn().mockReturnValue(fakeRetrievalUrl),
-        }),
+        download: vi.fn().mockResolvedValue(blob),
       },
     } as any)
-
-    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-      new Response(blob, { status: 200 })
-    )
 
     const outputPath = join(tempDir, 'cid-downloaded.txt')
     await downloadFile({

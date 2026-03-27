@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { cli, command } from 'cleye'
-import { encryptFile } from './commands/encrypt.js'
 import { decryptFile } from './commands/decrypt.js'
-import { uploadFile } from './commands/upload.js'
 import { downloadFile } from './commands/download.js'
+import { encryptFile } from './commands/encrypt.js'
+import { rangeDecrypt } from './commands/range.js'
+import { uploadFile } from './commands/upload.js'
 
 const encryptCommand = command(
   {
@@ -159,7 +160,11 @@ const downloadCommand = command(
         locator: argv._.locator,
         key: argv.flags.key,
         password: argv.flags.password,
-        output: argv.flags.output ?? (() => { throw new Error('--output is required') })(),
+        output:
+          argv.flags.output ??
+          (() => {
+            throw new Error('--output is required')
+          })(),
         privateKey: argv.flags.privateKey,
       })
     } catch (err) {
@@ -206,9 +211,29 @@ const rangeCommand = command(
       },
     },
   },
-  () => {
-    console.error('not implemented')
-    process.exit(1)
+  async (argv) => {
+    try {
+      await rangeDecrypt({
+        locator: argv._.locator,
+        key: argv.flags.key,
+        password: argv.flags.password,
+        offset:
+          argv.flags.offset ??
+          (() => {
+            throw new Error('--offset is required')
+          })(),
+        length:
+          argv.flags.length ??
+          (() => {
+            throw new Error('--length is required')
+          })(),
+        output: argv.flags.output,
+        privateKey: argv.flags.privateKey,
+      })
+    } catch (err) {
+      console.error(`Error: ${err instanceof Error ? err.message : String(err)}`)
+      process.exit(1)
+    }
   }
 )
 

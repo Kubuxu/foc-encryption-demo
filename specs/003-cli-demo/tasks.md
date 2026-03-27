@@ -135,13 +135,13 @@
 
 ### Tests for US5
 
-- [ ] T029 [US5] Write failing integration test in `demo/tests/integration/range.test.ts` — mock HTTP server returning Range responses, encrypt a file in chunked mode, verify range decryption returns correct plaintext slice; verify error when used on non-seekable blob
+- [X] T029 [US5] Write failing integration test in `demo/tests/integration/range.test.ts` — mock HTTP server returning Range responses, encrypt a file in chunked mode, verify range decryption returns correct plaintext slice; verify error when used on non-seekable blob
 
 ### Implementation for US5
 
-- [ ] T030 [US5] Implement `demo/src/commands/range.ts` — parse locator, resolve URL, create BlobFetcher, parse envelope for salt + seekability check, resolve key, call `foc-encryption.decryptRange()`, write to output or stdout
-- [ ] T031 [US5] Wire range command in `demo/src/cli.ts`
-- [ ] T032 [US5] Verify integration test passes
+- [X] T030 [US5] Implement `demo/src/commands/range.ts` — parse locator, resolve URL, create BlobFetcher, parse envelope for salt + seekability check, resolve key, call `foc-encryption.decryptRange()`, write to output or stdout
+- [X] T031 [US5] Wire range command in `demo/src/cli.ts`
+- [X] T032 [US5] Verify integration test passes
 
 **Checkpoint**: Range decryption works for chunked blobs. Clear error for non-seekable blobs.
 
@@ -155,7 +155,7 @@
 
 ### Implementation for US6
 
-- [ ] T033 [US6] Create `demo/README.md` — prerequisites (Node.js 20+, pnpm, funded Filecoin Calibration wallet for upload), build instructions (`pnpm install && pnpm --filter foc-demo build`), usage examples for all 5 commands, PieceCID vs HTTP URL explanation, environment variables reference (`FOC_PRIVATE_KEY`), error troubleshooting section
+- [X] T033 [US6] Create `demo/README.md` — prerequisites (Node.js 20+, pnpm, funded Filecoin Calibration wallet for upload), build instructions (`pnpm install && pnpm --filter foc-demo build`), usage examples for all 5 commands, PieceCID vs HTTP URL explanation, environment variables reference (`FOC_PRIVATE_KEY`), error troubleshooting section
 
 **Checkpoint**: README is complete and accurate. All command examples match actual CLI behavior.
 
@@ -165,11 +165,11 @@
 
 **Purpose**: Final cleanup and validation
 
-- [ ] T034 [P] Verify all commands handle missing `--key`/`--password` with actionable error message
-- [ ] T035 [P] Verify `--private-key` / `FOC_PRIVATE_KEY` errors are clear when wallet is needed but not provided
-- [ ] T036 Run full test suite: `pnpm --filter foc-demo test`
-- [ ] T037 Run linting: `npx biome check demo/`
-- [ ] T038 Run quickstart.md scenarios manually and verify output matches documentation
+- [X] T034 [P] Verify all commands handle missing `--key`/`--password` with actionable error message
+- [X] T035 [P] Verify `--private-key` / `FOC_PRIVATE_KEY` errors are clear when wallet is needed but not provided
+- [X] T036 Run full test suite: `pnpm --filter foc-demo test`
+- [X] T037 Run linting: `npx biome check demo/`
+- [X] T038 Run quickstart.md scenarios manually and verify output matches documentation
 
 ---
 
