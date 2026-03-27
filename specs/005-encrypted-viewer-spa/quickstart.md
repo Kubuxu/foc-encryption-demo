@@ -12,7 +12,7 @@
 
 ```bash
 # From repo root
-cd viewer
+cd packages/foc-viewer
 pnpm install
 ```
 
@@ -35,7 +35,7 @@ Opens at `http://localhost:5173`. Test with:
 pnpm run build
 ```
 
-Output: `viewer/dist/index.html` (single file or HTML + JS bundle)
+Output: `packages/foc-viewer/dist/index.html` (single file or HTML + JS bundle)
 
 ## Test
 
@@ -49,7 +49,7 @@ Runs Vitest unit tests for fragment parsing and content-type detection.
 
 1. **Encrypt content** using the CLI demo:
    ```bash
-   cd demo
+   cd packages/foc-demo
    pnpm run cli encrypt myfile.html --password "secret" --output encrypted.bin
    ```
 

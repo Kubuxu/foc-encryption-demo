@@ -12,7 +12,7 @@
 
 ## R2: PBKDF2 Key Derivation from Password
 
-**Decision**: Reuse the key derivation logic from `demo/src/key.ts` in the viewer.
+**Decision**: Reuse the key derivation logic from `packages/foc-demo/src/key.ts` in the viewer.
 
 **Rationale**: The demo already implements PBKDF2 key derivation using Web Crypto API:
 - 600,000 iterations, SHA-256, 16-byte random salt, 256-bit output

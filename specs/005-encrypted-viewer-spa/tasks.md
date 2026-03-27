@@ -17,10 +17,10 @@
 
 **Purpose**: Initialize the viewer workspace package with Vite, TypeScript, and foc-encryption dependency
 
-- [ ] T001 Create viewer workspace package with package.json, tsconfig.json, and add to pnpm-workspace.yaml in viewer/
-- [ ] T002 Configure Vite for single-file HTML output in viewer/vite.config.ts
-- [ ] T003 Create entry HTML shell with minimal inline CSS (centered container, form styles, error styles) in viewer/index.html
-- [ ] T004 [P] Configure Vitest for viewer tests in viewer/vitest.config.ts
+- [ ] T001 Create viewer workspace package with package.json, tsconfig.json in packages/foc-viewer/ (already matched by packages/* in pnpm-workspace.yaml)
+- [ ] T002 Configure Vite for single-file HTML output in packages/foc-viewer/vite.config.ts
+- [ ] T003 Create entry HTML shell with minimal inline CSS (centered container, form styles, error styles) in packages/foc-viewer/index.html
+- [ ] T004 [P] Configure Vitest for viewer tests in packages/foc-viewer/vitest.config.ts
 
 ---
 
@@ -32,17 +32,17 @@
 
 ### Tests (TDD -- write first, verify they fail)
 
-- [ ] T005 [P] Write unit tests for fragment encode/decode (round-trips, missing password, malformed, special characters) in viewer/tests/fragment.test.ts
-- [ ] T006 [P] Write unit tests for content-type detection from magic bytes (PNG, JPEG, GIF, WebP, PDF, HTML, plain text, binary fallback) in viewer/tests/render.test.ts
+- [ ] T005 [P] Write unit tests for fragment encode/decode (round-trips, missing password, malformed, special characters) in packages/foc-viewer/tests/fragment.test.ts
+- [ ] T006 [P] Write unit tests for content-type detection from magic bytes (PNG, JPEG, GIF, WebP, PDF, HTML, plain text, binary fallback) in packages/foc-viewer/tests/render.test.ts
 
 ### Implementation
 
-- [ ] T007 [P] Implement fragment encode/decode module (`parseFragment`, `buildFragment`) in viewer/src/fragment.ts
-- [ ] T008 [P] Implement content-type detection (`detectContentType`) from magic bytes in viewer/src/render.ts
-- [ ] T009 Implement decrypt pipeline (fetch blob, parse envelope, extract PBKDF2 salt, derive CEK, decrypt) in viewer/src/decrypt.ts
-- [ ] T010 Implement UI primitives (showForm, showPasswordPrompt, showLoading, showError, renderContent) in viewer/src/ui.ts
+- [ ] T007 [P] Implement fragment encode/decode module (`parseFragment`, `buildFragment`) in packages/foc-viewer/src/fragment.ts
+- [ ] T008 [P] Implement content-type detection (`detectContentType`) from magic bytes in packages/foc-viewer/src/render.ts
+- [ ] T009 Implement decrypt pipeline (fetch blob, parse envelope, extract PBKDF2 salt, derive CEK, decrypt) in packages/foc-viewer/src/decrypt.ts
+- [ ] T010 Implement UI primitives (showForm, showPasswordPrompt, showLoading, showError, renderContent) in packages/foc-viewer/src/ui.ts
 
-**Checkpoint**: All foundational modules built and tested. `pnpm run test` passes in viewer/.
+**Checkpoint**: All foundational modules built and tested. `pnpm run test` passes in packages/foc-viewer/.
 
 ---
 
@@ -54,8 +54,8 @@
 
 ### Implementation
 
-- [ ] T011 [US1] Implement main entry point: on page load, parse fragment, detect `auto-decrypt` mode, call decrypt pipeline, render result in viewer/src/main.ts
-- [ ] T012 [US1] Wire up error handling for fetch failures and decryption errors (AuthenticationError → "Wrong password", network error → "Could not fetch") in viewer/src/main.ts
+- [ ] T011 [US1] Implement main entry point: on page load, parse fragment, detect `auto-decrypt` mode, call decrypt pipeline, render result in packages/foc-viewer/src/main.ts
+- [ ] T012 [US1] Wire up error handling for fetch failures and decryption errors (AuthenticationError → "Wrong password", network error → "Could not fetch") in packages/foc-viewer/src/main.ts
 
 **Checkpoint**: US1 fully functional. Auto-decrypt from shared link works end-to-end.
 
@@ -69,8 +69,8 @@
 
 ### Implementation
 
-- [ ] T013 [US2] Add `manual-entry` mode to main.ts: show form via ui.ts, handle "View Content" submit → decrypt pipeline → renderContent → update fragment in viewer/src/main.ts
-- [ ] T014 [US2] Update URL fragment after successful decrypt using `history.replaceState` and `buildFragment` in viewer/src/main.ts
+- [ ] T013 [US2] Add `manual-entry` mode to main.ts: show form via ui.ts, handle "View Content" submit → decrypt pipeline → renderContent → update fragment in packages/foc-viewer/src/main.ts
+- [ ] T014 [US2] Update URL fragment after successful decrypt using `history.replaceState` and `buildFragment` in packages/foc-viewer/src/main.ts
 
 **Checkpoint**: US1 + US2 both work. Manual entry form and auto-decrypt from fragment.
 
@@ -84,7 +84,7 @@
 
 ### Implementation
 
-- [ ] T015 [US3] Add "Copy Link" button handler: build fragment from form values, construct full URL, copy to clipboard, show confirmation in viewer/src/main.ts and viewer/src/ui.ts
+- [ ] T015 [US3] Add "Copy Link" button handler: build fragment from form values, construct full URL, copy to clipboard, show confirmation in packages/foc-viewer/src/main.ts and packages/foc-viewer/src/ui.ts
 
 **Checkpoint**: US1 + US2 + US3 all work. Link generation and copy to clipboard functional.
 
@@ -98,7 +98,7 @@
 
 ### Implementation
 
-- [ ] T016 [US4] Add `password-prompt` mode to main.ts: detect URL-only fragment, show password prompt via ui.ts, on submit → decrypt pipeline → renderContent → update fragment in viewer/src/main.ts
+- [ ] T016 [US4] Add `password-prompt` mode to main.ts: detect URL-only fragment, show password prompt via ui.ts, on submit → decrypt pipeline → renderContent → update fragment in packages/foc-viewer/src/main.ts
 
 **Checkpoint**: All 4 user stories work independently and together.
 
@@ -108,10 +108,10 @@
 
 **Purpose**: Content-type rendering for non-HTML types, edge cases, build verification
 
-- [ ] T017 [P] Implement content rendering by type: HTML (replace DOM), images (centered `<img>` + download), PDF (`<embed>` + download), text (`<pre>` + download), binary (download only) in viewer/src/render.ts
-- [ ] T018 [P] Add loading indicator (shown during fetch+decrypt) in viewer/src/ui.ts
-- [ ] T019 Build and verify single-file output with `pnpm run build`, confirm viewer/dist/index.html works standalone
-- [ ] T020 Verify all tests pass, biome check passes, build succeeds: `npx biome check . && pnpm run test && pnpm run build` from viewer/
+- [ ] T017 [P] Implement content rendering by type: HTML (replace DOM), images (centered `<img>` + download), PDF (`<embed>` + download), text (`<pre>` + download), binary (download only) in packages/foc-viewer/src/render.ts
+- [ ] T018 [P] Add loading indicator (shown during fetch+decrypt) in packages/foc-viewer/src/ui.ts
+- [ ] T019 Build and verify single-file output with `pnpm run build`, confirm packages/foc-viewer/dist/index.html works standalone
+- [ ] T020 Verify all tests pass, biome check passes, build succeeds: `npx biome check . && pnpm run test && pnpm run build` from packages/foc-viewer/
 
 ---
 
@@ -168,5 +168,5 @@
 - [P] tasks = different files, no dependencies
 - Commit after each phase per user preference
 - This is a demo -- keep implementation minimal
-- All source files in viewer/src/, tests in viewer/tests/
+- All source files in packages/foc-viewer/src/, tests in packages/foc-viewer/tests/
 - Content-type rendering (T017) is deferred to Polish since US1-US4 work with HTML content initially

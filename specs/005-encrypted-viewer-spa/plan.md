@@ -49,7 +49,7 @@ specs/005-encrypted-viewer-spa/
 ### Source Code (repository root)
 
 ```text
-viewer/
+packages/foc-viewer/
 ├── package.json         # Workspace package, depends on foc-encryption
 ├── tsconfig.json        # TypeScript config
 ├── vite.config.ts       # Vite config (inline single HTML output)
@@ -65,7 +65,7 @@ viewer/
     └── render.test.ts   # Content-type detection from magic bytes
 ```
 
-**Structure Decision**: New `viewer/` workspace package alongside existing `demo/` (CLI). Follows the same pattern: workspace dependency on `foc-encryption`, own tsconfig, own tests. Vite bundles everything into a single HTML file for static hosting.
+**Structure Decision**: New `packages/foc-viewer/` workspace package alongside existing `packages/foc-demo/` (CLI) and `packages/foc-encryption/` (library). Follows the same monorepo pattern: workspace dependency on `foc-encryption`, own tsconfig, own tests. Vite bundles everything into a single HTML file for static hosting.
 
 ## Complexity Tracking
 
