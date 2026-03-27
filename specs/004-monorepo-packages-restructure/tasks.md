@@ -64,8 +64,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Verify `pnpm build` from `packages/foc-encryption/` compiles only the library and outputs to `packages/foc-encryption/dist/`
-- [ ] T015 [US2] Verify `pnpm test` from `packages/foc-encryption/` runs only the library test suite and passes
+- [x] T014 [US2] Verify `pnpm build` from `packages/foc-encryption/` compiles only the library and outputs to `packages/foc-encryption/dist/`
+- [x] T015 [US2] Verify `pnpm test` from `packages/foc-encryption/` runs only the library test suite and passes
 
 > These are verification tasks — no file changes needed if US1 is correctly implemented. If either check fails, fix the library's `package.json` or `tsconfig.json` in `packages/foc-encryption/`.
 
@@ -82,8 +82,8 @@
 ### Implementation for User Story 3
 
 - [x] T016 [US3] Update `packages/foc-demo/package.json` wireit build dependency — change `"../: build"` to `"../foc-encryption: build"` in `wireit.build.dependencies`
-- [ ] T017 [US3] Verify `pnpm build` from `packages/foc-demo/` resolves `foc-encryption` from workspace (`node_modules/foc-encryption` is a symlink to `packages/foc-encryption`)
-- [ ] T018 [US3] Verify wireit incremental build — confirm `packages/foc-demo` build re-runs when a file in `packages/foc-encryption/src/` is touched
+- [x] T017 [US3] Verify `pnpm build` from `packages/foc-demo/` resolves `foc-encryption` from workspace (`node_modules/foc-encryption` is a symlink to `packages/foc-encryption`)
+- [x] T018 [US3] Verify wireit incremental build — confirm `packages/foc-demo` build re-runs when a file in `packages/foc-encryption/src/` is touched
 
 **Checkpoint**: User Story 3 complete — workspace dependency chain is fully functional.
 
