@@ -54,8 +54,8 @@
 
 ### Implementation
 
-- [ ] T011 [US1] Implement main entry point: on page load, parse fragment, detect `auto-decrypt` mode, call decrypt pipeline, render result in packages/foc-viewer/src/main.ts
-- [ ] T012 [US1] Wire up error handling for fetch failures and decryption errors (AuthenticationError → "Wrong password", network error → "Could not fetch") in packages/foc-viewer/src/main.ts
+- [x] T011 [US1] Implement main entry point: on page load, parse fragment, detect `auto-decrypt` mode, call decrypt pipeline, render result in packages/foc-viewer/src/main.ts
+- [x] T012 [US1] Wire up error handling for fetch failures and decryption errors (AuthenticationError → "Wrong password", network error → "Could not fetch") in packages/foc-viewer/src/main.ts
 
 **Checkpoint**: US1 fully functional. Auto-decrypt from shared link works end-to-end.
 
