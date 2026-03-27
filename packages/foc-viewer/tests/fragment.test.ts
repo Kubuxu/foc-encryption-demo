@@ -24,14 +24,14 @@ describe('parseFragment', () => {
 
   it('handles special characters in url', () => {
     const url = 'https://example.com/path?q=1&r=2'
-    const hash = '#url=' + encodeURIComponent(url)
+    const hash = `#url=${encodeURIComponent(url)}`
     const result = parseFragment(hash)
     expect(result?.url).toBe(url)
   })
 
   it('handles special characters in password', () => {
     const password = 'p@ss w0rd! #$%'
-    const hash = '#url=https%3A%2F%2Fex.com&pw=' + encodeURIComponent(password)
+    const hash = `#url=https%3A%2F%2Fex.com&pw=${encodeURIComponent(password)}`
     const result = parseFragment(hash)
     expect(result?.password).toBe(password)
   })

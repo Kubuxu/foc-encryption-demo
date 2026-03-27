@@ -24,9 +24,18 @@ describe('detectContentType', () => {
   it('detects WebP from magic bytes', async () => {
     // RIFF....WEBP
     const data = bytes(
-      0x52, 0x49, 0x46, 0x46, // RIFF
-      0x00, 0x00, 0x00, 0x00, // file size (placeholder)
-      0x57, 0x45, 0x42, 0x50  // WEBP
+      0x52,
+      0x49,
+      0x46,
+      0x46, // RIFF
+      0x00,
+      0x00,
+      0x00,
+      0x00, // file size (placeholder)
+      0x57,
+      0x45,
+      0x42,
+      0x50 // WEBP
     )
     expect(await detectContentType(data)).toBe('image/webp')
   })

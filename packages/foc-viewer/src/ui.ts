@@ -1,9 +1,5 @@
 function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 export interface FormCallbacks {
@@ -36,21 +32,17 @@ export function showForm(
   const urlInput = container.querySelector<HTMLInputElement>('#url-input')!
   const pwInput = container.querySelector<HTMLInputElement>('#pw-input')!
 
-  container.querySelector('#view-btn')!.addEventListener('click', () => {
+  container.querySelector('#view-btn')?.addEventListener('click', () => {
     callbacks.onViewContent(urlInput.value.trim(), pwInput.value)
   })
 
-  container.querySelector('#copy-btn')!.addEventListener('click', () => {
+  container.querySelector('#copy-btn')?.addEventListener('click', () => {
     callbacks.onCopyLink(urlInput.value.trim(), pwInput.value)
   })
 }
 
 /** Show a password prompt with a read-only URL field. */
-export function showPasswordPrompt(
-  container: HTMLElement,
-  url: string,
-  onSubmit: (password: string) => void
-): void {
+export function showPasswordPrompt(container: HTMLElement, url: string, onSubmit: (password: string) => void): void {
   container.innerHTML = `
     <h1>FOC Encrypted Content Viewer</h1>
     <div class="form-group">
@@ -70,7 +62,7 @@ export function showPasswordPrompt(
   pwInput.focus()
 
   const submit = () => onSubmit(pwInput.value)
-  container.querySelector('#view-btn')!.addEventListener('click', submit)
+  container.querySelector('#view-btn')?.addEventListener('click', submit)
   pwInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submit()
   })
@@ -105,31 +97,4 @@ export function showConfirmation(container: HTMLElement, message: string): void 
       msg.innerHTML = ''
     }, 3000)
   }
-}
-
-/**
- * Render decrypted content into the container.
- * Full type-based rendering is implemented in Phase 7 (render.ts / T017).
- * This stub renders HTML inline and falls back to a download link.
- */
-export function renderContent(
-  container: HTMLElement,
-  data: Uint8Array,
-  contentType: string
-): void {
-  if (contentType === 'text/html') {
-    document.body.innerHTML = new TextDecoder().decode(data)
-    return
-  }
-
-  const blob = new Blob([data as Uint8Array<ArrayBuffer>], { type: contentType })
-  const url = URL.createObjectURL(blob)
-  const filename = 'decrypted-content'
-
-  container.innerHTML = `
-    <div class="content-wrapper">
-      <p>Content decrypted successfully (${escapeHtml(contentType)}).</p>
-      <a class="download-link" href="${url}" download="${escapeHtml(filename)}">Download file</a>
-    </div>
-  `
 }

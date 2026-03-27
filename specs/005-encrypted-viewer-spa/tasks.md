@@ -98,7 +98,7 @@
 
 ### Implementation
 
-- [ ] T016 [US4] Add `password-prompt` mode to main.ts: detect URL-only fragment, show password prompt via ui.ts, on submit → decrypt pipeline → renderContent → update fragment in packages/foc-viewer/src/main.ts
+- [x] T016 [US4] Add `password-prompt` mode to main.ts: detect URL-only fragment, show password prompt via ui.ts, on submit → decrypt pipeline → renderContent → update fragment in packages/foc-viewer/src/main.ts
 
 **Checkpoint**: All 4 user stories work independently and together.
 
@@ -108,10 +108,10 @@
 
 **Purpose**: Content-type rendering for non-HTML types, edge cases, build verification
 
-- [ ] T017 [P] Implement content rendering by type: HTML (replace DOM), images (centered `<img>` + download), PDF (`<embed>` + download), text (`<pre>` + download), binary (download only) in packages/foc-viewer/src/render.ts
-- [ ] T018 [P] Add loading indicator (shown during fetch+decrypt) in packages/foc-viewer/src/ui.ts
-- [ ] T019 Build and verify single-file output with `pnpm run build`, confirm packages/foc-viewer/dist/index.html works standalone
-- [ ] T020 Verify all tests pass, biome check passes, build succeeds: `npx biome check . && pnpm run test && pnpm run build` from packages/foc-viewer/
+- [x] T017 [P] Implement content rendering by type: HTML (replace DOM), images (centered `<img>` + download), PDF (`<embed>` + download), text (`<pre>` + download), binary (download only) in packages/foc-viewer/src/render.ts
+- [x] T018 [P] Add loading indicator (shown during fetch+decrypt) in packages/foc-viewer/src/ui.ts
+- [x] T019 Build and verify single-file output with `pnpm run build`, confirm packages/foc-viewer/dist/index.html works standalone
+- [x] T020 Verify all tests pass, biome check passes, build succeeds: `npx biome check . && pnpm run test && pnpm run build` from packages/foc-viewer/
 
 ---
 

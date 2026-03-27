@@ -21,5 +21,5 @@ export function buildFragment(params: FragmentParams): string {
   if (params.password !== undefined) {
     p.set('pw', params.password)
   }
-  return '#' + p.toString()
+  return `#${p.toString()}`
 }

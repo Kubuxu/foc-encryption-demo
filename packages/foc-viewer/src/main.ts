@@ -1,7 +1,7 @@
-import { parseFragment, buildFragment } from './fragment.js'
 import { fetchAndDecrypt } from './decrypt.js'
-import { detectContentType } from './render.js'
-import { showForm, showLoading, showError, showConfirmation, renderContent } from './ui.js'
+import { buildFragment, parseFragment } from './fragment.js'
+import { detectContentType, renderContent } from './render.js'
+import { showConfirmation, showError, showForm, showLoading, showPasswordPrompt } from './ui.js'
 
 const container = document.getElementById('app')!
 
@@ -27,22 +27,14 @@ function init(): void {
   }
 
   if (fragment?.url) {
-    // US4: Password-prompt mode (#url=... only) — implemented in Phase 6
-    // For now fall through to form with URL pre-filled
-    showForm(container, {
-      onViewContent: async (url, password) => {
-        await runAutoDecrypt(url, password)
-        if (url && password) {
-          history.replaceState(null, '', buildFragment({ url, password }))
-        }
-      },
-      onCopyLink: (url, password) => {
-        const link = window.location.origin + window.location.pathname + buildFragment({ url, password })
-        navigator.clipboard.writeText(link).then(() => {
-          showConfirmation(container, 'Link copied to clipboard!')
-        })
-      },
-    }, { url: fragment.url })
+    // US4: Password-prompt mode (#url=... only)
+    const blobUrl = fragment.url
+    showPasswordPrompt(container, blobUrl, async (password) => {
+      await runAutoDecrypt(blobUrl, password)
+      if (password) {
+        history.replaceState(null, '', buildFragment({ url: blobUrl, password }))
+      }
+    })
     return
   }
 
