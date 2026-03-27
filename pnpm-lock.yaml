@@ -73,6 +73,9 @@ importers:
       vite:
         specifier: ^6.0.0
         version: 6.4.1(@types/node@22.7.5)
+      vite-plugin-singlefile:
+        specifier: ^2.3.2
+        version: 2.3.2(rollup@4.60.0)(vite@6.4.1)
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@22.7.5)
@@ -1106,6 +1109,13 @@ packages:
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
+  vite-plugin-singlefile@2.3.2:
+    resolution: {integrity: sha512-b8SxCi/gG7K298oJDcKOuZeU6gf6wIcCJAaEqUmmZXdjfuONlkyNyWZC3tEbN6QockRCNUd3it9eGTtpHGoYmg==}
+    engines: {node: '>18.0.0'}
+    peerDependencies:
+      rollup: ^4.59.0
+      vite: ^5.4.11 || ^6.0.0 || ^7.0.0 || ^8.0.0
+
   vite@6.4.1:
     resolution: {integrity: sha512-+Oxm7q9hDoLMyJOYfUYBuHQo+dkAloi33apOPP56pzj+vsdJDzr+j1NISE5pyaAuKL4A3UD34qd0lx5+kfKp2g==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -2118,6 +2128,12 @@ snapshots:
       - terser
       - tsx
       - yaml
+
+  vite-plugin-singlefile@2.3.2(rollup@4.60.0)(vite@6.4.1):
+    dependencies:
+      micromatch: 4.0.8
+      rollup: 4.60.0
+      vite: 6.4.1(@types/node@22.7.5)
 
   vite@6.4.1(@types/node@22.7.5):
     dependencies:
