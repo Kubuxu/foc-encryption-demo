@@ -32,15 +32,15 @@
 
 ### Tests (TDD -- write first, verify they fail)
 
-- [ ] T005 [P] Write unit tests for fragment encode/decode (round-trips, missing password, malformed, special characters) in packages/foc-viewer/tests/fragment.test.ts
-- [ ] T006 [P] Write unit tests for content-type detection from magic bytes (PNG, JPEG, GIF, WebP, PDF, HTML, plain text, binary fallback) in packages/foc-viewer/tests/render.test.ts
+- [x] T005 [P] Write unit tests for fragment encode/decode (round-trips, missing password, malformed, special characters) in packages/foc-viewer/tests/fragment.test.ts
+- [x] T006 [P] Write unit tests for content-type detection from magic bytes (PNG, JPEG, GIF, WebP, PDF, HTML, plain text, binary fallback) in packages/foc-viewer/tests/render.test.ts
 
 ### Implementation
 
-- [ ] T007 [P] Implement fragment encode/decode module (`parseFragment`, `buildFragment`) in packages/foc-viewer/src/fragment.ts
-- [ ] T008 [P] Implement content-type detection (`detectContentType`) from magic bytes in packages/foc-viewer/src/render.ts
-- [ ] T009 Implement decrypt pipeline (fetch blob, parse envelope, extract PBKDF2 salt, derive CEK, decrypt) in packages/foc-viewer/src/decrypt.ts
-- [ ] T010 Implement UI primitives (showForm, showPasswordPrompt, showLoading, showError, renderContent) in packages/foc-viewer/src/ui.ts
+- [x] T007 [P] Implement fragment encode/decode module (`parseFragment`, `buildFragment`) in packages/foc-viewer/src/fragment.ts
+- [x] T008 [P] Implement content-type detection (`detectContentType`) from magic bytes in packages/foc-viewer/src/render.ts
+- [x] T009 Implement decrypt pipeline (fetch blob, parse envelope, extract PBKDF2 salt, derive CEK, decrypt) in packages/foc-viewer/src/decrypt.ts
+- [x] T010 Implement UI primitives (showForm, showPasswordPrompt, showLoading, showError, renderContent) in packages/foc-viewer/src/ui.ts
 
 **Checkpoint**: All foundational modules built and tested. `pnpm run test` passes in packages/foc-viewer/.
 
