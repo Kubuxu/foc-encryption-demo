@@ -58,3 +58,7 @@ pnpm typecheck  # TypeScript type-check
 ## Encryption format
 
 Blobs must be encrypted with `foc-encryption` and include a `pbkdf2_salt` field in `appMetadata`. Use `foc-demo` to produce compatible blobs.
+
+## Sample
+Sample URL: https://calib2.ezpdpz.net/piece/bafkzcibeudqbmed2hq75hjwry67454ubmecbcqltv7mhvxh7yaw2ztvvqjbhjeeyei
+Sample Password: `hardPasswordSure`
