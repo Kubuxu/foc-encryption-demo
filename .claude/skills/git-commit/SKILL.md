@@ -110,15 +110,10 @@ chore: update gitignore for new build artifacts
 
 ## Commit Execution
 
-When running the commit, use a heredoc to preserve formatting:
+When running the commit, use multiple `-m` flags to preserve formatting:
 
 ```bash
-git commit -m "$(cat <<'EOF'
-type(scope): subject line here
-
-Optional body goes here, wrapped at 72 characters.
-
-Optional footer.
-EOF
-)"
+git commit -m "type(scope): subject line here" -m "Optional body goes here, wrapped at 72 characters." -m "Optional footer."
 ```
+
+Each `-m` flag becomes a separate paragraph in the commit message. Use one `-m` for the subject, one for the body (if any), and one for the footer (if any). Omit body and footer `-m` flags when not needed.
