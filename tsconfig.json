@@ -6,12 +6,12 @@
     "moduleResolution": "bundler",
     "verbatimModuleSyntax": true,
     "erasableSyntaxOnly": true,
-    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": "src",
+    "noEmitOnError": true,
     "skipLibCheck": true,
     "lib": ["ESNext", "DOM"]
   },

@@ -8,9 +8,25 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc --build --pretty",
+    "build": "wireit",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
+  },
+  "wireit": {
+    "build": {
+      "command": "tsc --pretty",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.ts",
+        "tsconfig.json"
+      ],
+      "output": [
+        "dist/**"
+      ],
+      "dependencies": [
+        "../:build"
+      ]
+    }
   },
   "bin": {
     "foc-demo": "./dist/cli.js"
@@ -24,6 +40,7 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "typescript": "^5.9.0",
-    "vitest": "^3.0.0"
+    "vitest": "^3.0.0",
+    "wireit": "^0.14.0"
   }
 }
