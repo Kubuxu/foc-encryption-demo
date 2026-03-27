@@ -5,7 +5,7 @@ A command-line tool for encrypting files with [foc-encryption](../../README.md) 
 ## Prerequisites
 
 - Node.js 20+
-- pnpm 9+
+- pnpm 10+
 - A funded Filecoin Calibration testnet wallet (required for `upload`, `download` with PieceCID, and `range` with PieceCID)
 
 ## Build

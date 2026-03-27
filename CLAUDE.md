@@ -12,13 +12,13 @@ Auto-generated from all feature plans. Last updated: 2026-03-27
 ## Project Structure
 
 ```text
-src/
-tests/
+packages/foc-encryption/  — encryption envelope library
+packages/foc-demo/        — CLI demo (encrypt/decrypt/upload/download)
 ```
 
 ## Commands
 
-npx biome check . && npm test && npm run lint
+pnpx biome check . && pnpm test && pnpm lint
 
 ## Code Style
 
