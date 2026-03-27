@@ -16,7 +16,7 @@ export async function fetchBlob(locator: PieceLocator, synapse?: SynapseClient):
     return new Uint8Array(await resp.arrayBuffer())
   }
   if (!synapse) {
-    throw new Error('FOC_PRIVATE_KEY not set. Provide --private-key or set the environment variable.')
+    throw new Error('PRIVATE_KEY not set. Provide --private-key or set the environment variable.')
   }
   return synapse.storage.download({ pieceCid: locator.pieceCid })
 }

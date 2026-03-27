@@ -106,7 +106,7 @@ const uploadCommand = command(
       },
       privateKey: {
         type: String,
-        description: 'Wallet private key (or set FOC_PRIVATE_KEY env var)',
+        description: 'Wallet private key (or set PRIVATE_KEY env var)',
       },
     },
   },

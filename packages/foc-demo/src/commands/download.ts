@@ -18,10 +18,10 @@ export async function downloadFile(flags: DownloadFlags): Promise<void> {
 
   let synapse: ReturnType<typeof createSynapseClient> | undefined
   if (locator.kind === 'pieceCid') {
-    const privateKey = flags.privateKey ?? process.env.FOC_PRIVATE_KEY
+    const privateKey = flags.privateKey ?? process.env.PRIVATE_KEY
     if (!privateKey) {
       throw new Error(
-        'FOC_PRIVATE_KEY not set. Provide --private-key or set the environment variable.'
+        'PRIVATE_KEY not set. Provide --private-key or set the environment variable.'
       )
     }
     synapse = createSynapseClient({ privateKey })

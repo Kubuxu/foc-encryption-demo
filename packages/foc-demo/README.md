@@ -59,7 +59,7 @@ node packages/foc-demo/dist/cli.js decrypt myfile.pdf.enc --password "passphrase
 Requires a Filecoin wallet with USDFC balance for storage payments.
 
 ```bash
-export FOC_PRIVATE_KEY=0xabcdef...  # or use --private-key flag
+export PRIVATE_KEY=0xabcdef...  # or use --private-key flag
 
 node packages/foc-demo/dist/cli.js upload myfile.pdf --password "my secret passphrase"
 # Output:
@@ -81,7 +81,7 @@ node packages/foc-demo/dist/cli.js download https://provider.example/piece/baga6
   --password "my secret passphrase" --output myfile.pdf
 
 # Using PieceCID (requires wallet to resolve to a URL)
-export FOC_PRIVATE_KEY=0xabcdef...
+export PRIVATE_KEY=0xabcdef...
 node packages/foc-demo/dist/cli.js download baga6ea4seaq... \
   --password "my secret passphrase" --output myfile.pdf
 
@@ -100,7 +100,7 @@ node packages/foc-demo/dist/cli.js range https://provider.example/piece/baga6ea4
   --password "my secret passphrase" --offset 0 --length 1024 --output header.bin
 
 # Using PieceCID (requires wallet)
-export FOC_PRIVATE_KEY=0xabcdef...
+export PRIVATE_KEY=0xabcdef...
 node packages/foc-demo/dist/cli.js range baga6ea4seaq... \
   --password "my secret passphrase" --offset 0 --length 1024 --output header.bin
 
@@ -123,7 +123,7 @@ After `upload`, both are printed. Save the HTTP URL to share access without a wa
 
 | Variable | Description |
 |----------|-------------|
-| `FOC_PRIVATE_KEY` | Wallet private key for synapse-sdk (alternative to `--private-key` flag). Used by `upload`, `download` (PieceCID), and `range` (PieceCID). |
+| `PRIVATE_KEY` | Wallet private key for synapse-sdk (alternative to `--private-key` flag). Used by `upload`, `download` (PieceCID), and `range` (PieceCID). |
 | `RPC_URL` | Filecoin RPC endpoint (default: Calibration testnet via glif.io) |
 
 ## Error Troubleshooting
@@ -148,6 +148,6 @@ Only files > 256 KiB are encrypted in chunked (seekable) mode. Use `download` fo
 
 **Missing wallet for PieceCID:**
 ```
-Error: FOC_PRIVATE_KEY not set. Provide --private-key or set the environment variable.
+Error: PRIVATE_KEY not set. Provide --private-key or set the environment variable.
 ```
-Set `FOC_PRIVATE_KEY` or pass `--private-key 0x...` when using PieceCID locators.
+Set `PRIVATE_KEY` or pass `--private-key 0x...` when using PieceCID locators.

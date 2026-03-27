@@ -122,8 +122,8 @@ describe('range command', () => {
   })
 
   it('throws error when PieceCID locator used without private key', async () => {
-    const origEnv = process.env.FOC_PRIVATE_KEY
-    delete process.env.FOC_PRIVATE_KEY
+    const origEnv = process.env.PRIVATE_KEY
+    delete process.env.PRIVATE_KEY
 
     try {
       await expect(
@@ -133,10 +133,10 @@ describe('range command', () => {
           offset: 0,
           length: 100,
         })
-      ).rejects.toThrow('FOC_PRIVATE_KEY')
+      ).rejects.toThrow('PRIVATE_KEY')
     } finally {
       if (origEnv !== undefined) {
-        process.env.FOC_PRIVATE_KEY = origEnv
+        process.env.PRIVATE_KEY = origEnv
       }
     }
   })

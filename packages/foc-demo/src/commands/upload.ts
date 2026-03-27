@@ -12,10 +12,10 @@ export interface UploadFlags {
 }
 
 export async function uploadFile(flags: UploadFlags): Promise<void> {
-  const privateKey = flags.privateKey ?? process.env.FOC_PRIVATE_KEY
+  const privateKey = flags.privateKey ?? process.env.PRIVATE_KEY
   if (!privateKey) {
     throw new Error(
-      'FOC_PRIVATE_KEY not set. Provide --private-key or set the environment variable.'
+      'PRIVATE_KEY not set. Provide --private-key or set the environment variable.'
     )
   }
 

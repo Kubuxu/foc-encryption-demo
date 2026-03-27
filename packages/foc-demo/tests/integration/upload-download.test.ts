@@ -84,12 +84,12 @@ describe('upload command', () => {
     expect(logs.some((l) => l.includes(fakeRetrievalUrl))).toBe(true)
   })
 
-  it('uses FOC_PRIVATE_KEY env var when --private-key not provided', async () => {
+  it('uses PRIVATE_KEY env var when --private-key not provided', async () => {
     const inputPath = join(tempDir, 'testfile2.txt')
     await writeFile(inputPath, 'env var test content')
 
-    const origEnv = process.env.FOC_PRIVATE_KEY
-    process.env.FOC_PRIVATE_KEY = '0x' + 'cd'.repeat(32)
+    const origEnv = process.env.PRIVATE_KEY
+    process.env.PRIVATE_KEY = '0x' + 'cd'.repeat(32)
 
     try {
       await uploadFile({
@@ -98,9 +98,9 @@ describe('upload command', () => {
       })
     } finally {
       if (origEnv === undefined) {
-        delete process.env.FOC_PRIVATE_KEY
+        delete process.env.PRIVATE_KEY
       } else {
-        process.env.FOC_PRIVATE_KEY = origEnv
+        process.env.PRIVATE_KEY = origEnv
       }
     }
 
@@ -113,8 +113,8 @@ describe('upload command', () => {
     const inputPath = join(tempDir, 'testfile3.txt')
     await writeFile(inputPath, 'error test content')
 
-    const origEnv = process.env.FOC_PRIVATE_KEY
-    delete process.env.FOC_PRIVATE_KEY
+    const origEnv = process.env.PRIVATE_KEY
+    delete process.env.PRIVATE_KEY
 
     try {
       await expect(
@@ -122,10 +122,10 @@ describe('upload command', () => {
           file: inputPath,
           key: 'cc'.repeat(32),
         })
-      ).rejects.toThrow('FOC_PRIVATE_KEY')
+      ).rejects.toThrow('PRIVATE_KEY')
     } finally {
       if (origEnv !== undefined) {
-        process.env.FOC_PRIVATE_KEY = origEnv
+        process.env.PRIVATE_KEY = origEnv
       }
     }
   })
