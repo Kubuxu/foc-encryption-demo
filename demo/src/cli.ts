@@ -237,8 +237,19 @@ const rangeCommand = command(
   }
 )
 
-cli({
-  name: 'foc-demo',
-  version: '0.1.0',
-  commands: [encryptCommand, decryptCommand, uploadCommand, downloadCommand, rangeCommand],
-})
+cli(
+  {
+    name: 'foc-demo',
+    version: '0.1.0',
+    commands: [encryptCommand, decryptCommand, uploadCommand, downloadCommand, rangeCommand],
+  },
+  (argv) => {
+    const unknownCommand = argv._.splice(0)[0]
+    if (unknownCommand) {
+      console.error(`Unknown command: ${unknownCommand}`)
+      argv.showHelp()
+      process.exit(1)
+    }
+    argv.showHelp()
+  }
+)
