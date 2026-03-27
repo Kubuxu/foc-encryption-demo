@@ -84,7 +84,7 @@
 
 ### Implementation
 
-- [ ] T015 [US3] Add "Copy Link" button handler: build fragment from form values, construct full URL, copy to clipboard, show confirmation in packages/foc-viewer/src/main.ts and packages/foc-viewer/src/ui.ts
+- [x] T015 [US3] Add "Copy Link" button handler: build fragment from form values, construct full URL, copy to clipboard, show confirmation in packages/foc-viewer/src/main.ts and packages/foc-viewer/src/ui.ts
 
 **Checkpoint**: US1 + US2 + US3 all work. Link generation and copy to clipboard functional.
 
