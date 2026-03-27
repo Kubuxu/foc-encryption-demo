@@ -6,7 +6,6 @@ Auto-generated from all feature plans. Last updated: 2026-03-27
 - TypeScript 5.9+, ESM-only (`"type": "module"`) + `foc-encryption` (workspace), `@filoz/synapse-sdk`, `cleye`, `viem` (peer of synapse-sdk) (003-cli-demo)
 - Filecoin Onchain Cloud warm storage via synapse-sdk (003-cli-demo)
 - TypeScript 5.9+, Node.js ≥ 20 + pnpm 10 workspaces, wireit (incremental builds), biome (lint/format), vitest (tests) (004-monorepo-packages-restructure)
-
 - TypeScript 5.9+, ESM-only (`"type": "module"`) + `cborg` (CBOR encoding/decoding), Web Crypto API (AES-256-GCM) (001-encryption-envelope-lib)
 
 ## Project Structure
