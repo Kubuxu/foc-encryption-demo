@@ -17,10 +17,10 @@
 
 **Purpose**: Initialize the viewer workspace package with Vite, TypeScript, and foc-encryption dependency
 
-- [ ] T001 Create viewer workspace package with package.json, tsconfig.json in packages/foc-viewer/ (already matched by packages/* in pnpm-workspace.yaml)
-- [ ] T002 Configure Vite for single-file HTML output in packages/foc-viewer/vite.config.ts
-- [ ] T003 Create entry HTML shell with minimal inline CSS (centered container, form styles, error styles) in packages/foc-viewer/index.html
-- [ ] T004 [P] Configure Vitest for viewer tests in packages/foc-viewer/vitest.config.ts
+- [x] T001 Create viewer workspace package with package.json, tsconfig.json in packages/foc-viewer/ (already matched by packages/* in pnpm-workspace.yaml)
+- [x] T002 Configure Vite for single-file HTML output in packages/foc-viewer/vite.config.ts
+- [x] T003 Create entry HTML shell with minimal inline CSS (centered container, form styles, error styles) in packages/foc-viewer/index.html
+- [x] T004 [P] Configure Vitest for viewer tests in packages/foc-viewer/vitest.config.ts
 
 ---
 

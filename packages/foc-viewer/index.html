@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FOC Encrypted Content Viewer</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, sans-serif;
+        background: #f5f5f5;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #app {
+        width: 100%;
+        max-width: 600px;
+        padding: 2rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: #333;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+        color: #444;
+        font-size: 0.9rem;
+      }
+
+      input[type='url'],
+      input[type='text'],
+      input[type='password'] {
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+        background: #fff;
+      }
+
+      input:read-only {
+        background: #f0f0f0;
+        color: #666;
+      }
+
+      .button-row {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+      }
+
+      button {
+        padding: 0.6rem 1.25rem;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background: #2563eb;
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: #1d4ed8;
+      }
+
+      .btn-secondary {
+        background: #e5e7eb;
+        color: #333;
+      }
+
+      .btn-secondary:hover {
+        background: #d1d5db;
+      }
+
+      .error {
+        background: #fee2e2;
+        border: 1px solid #fca5a5;
+        color: #b91c1c;
+        padding: 0.75rem 1rem;
+        border-radius: 4px;
+        margin-top: 1rem;
+      }
+
+      .loading {
+        text-align: center;
+        color: #555;
+        padding: 2rem;
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        border: 3px solid #e5e7eb;
+        border-top-color: #2563eb;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 0.75rem;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .content-wrapper {
+        width: 100%;
+      }
+
+      .content-wrapper img {
+        max-width: 100%;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .content-wrapper pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #fff;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        font-size: 0.9rem;
+      }
+
+      .content-wrapper embed,
+      .content-wrapper iframe {
+        width: 100%;
+        min-height: 80vh;
+        border: none;
+      }
+
+      .download-link {
+        display: inline-block;
+        margin-top: 1rem;
+        color: #2563eb;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      .confirmation {
+        color: #15803d;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
