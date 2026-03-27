@@ -39,6 +39,10 @@ export type {
   SimpleEncryptOptions,
 } from './types.js'
 
+/** Derive a content encryption key from a password or raw hex material. */
+export type { KeySource, DerivedKey } from './kdf.js'
+export { deriveKey } from './kdf.js'
+
 export {
   /** AEAD authentication failed — tampered ciphertext or wrong key. */
   AuthenticationError,
