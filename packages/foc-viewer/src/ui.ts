@@ -29,8 +29,8 @@ export function showForm(
     </div>
     <div id="msg"></div>
   `
-  const urlInput = container.querySelector<HTMLInputElement>('#url-input')!
-  const pwInput = container.querySelector<HTMLInputElement>('#pw-input')!
+  const urlInput = container.querySelector('#url-input') as HTMLInputElement
+  const pwInput = container.querySelector('#pw-input') as HTMLInputElement
 
   container.querySelector('#view-btn')?.addEventListener('click', () => {
     callbacks.onViewContent(urlInput.value.trim(), pwInput.value)
@@ -58,7 +58,7 @@ export function showPasswordPrompt(container: HTMLElement, url: string, onSubmit
     </div>
     <div id="msg"></div>
   `
-  const pwInput = container.querySelector<HTMLInputElement>('#pw-input')!
+  const pwInput = container.querySelector('#pw-input') as HTMLInputElement
   pwInput.focus()
 
   const submit = () => onSubmit(pwInput.value)

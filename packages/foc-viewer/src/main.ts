@@ -3,7 +3,7 @@ import { buildFragment, parseFragment } from './fragment.js'
 import { detectContentType, renderContent } from './render.js'
 import { showConfirmation, showError, showForm, showLoading, showPasswordPrompt } from './ui.js'
 
-const container = document.getElementById('app')!
+const container = document.getElementById('app') as HTMLElement
 
 async function runAutoDecrypt(url: string, password: string): Promise<void> {
   showLoading(container)
