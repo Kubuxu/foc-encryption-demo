@@ -49,10 +49,11 @@ export function renderContent(container: HTMLElement, data: Uint8Array, contentT
   const filename = 'decrypted-content'
 
   if (contentType.startsWith('image/')) {
+    container.classList.add('wide')
     container.innerHTML = `
       <div class="content-wrapper">
-        <img src="${objectUrl}" alt="Decrypted image" style="max-width:100%;display:block;margin:0 auto;" />
-        <a class="download-link" href="${objectUrl}" download="${escapeHtml(filename)}">Download image</a>
+        <img src="${objectUrl}" alt="Decrypted image" style="max-width:100%;max-height:90vh;display:block;margin:0 auto;" />
+        <a class="download-link" href="${objectUrl}" download="${escapeHtml(filename)}" style="display:block;text-align:center;">Download image</a>
       </div>
     `
     return
