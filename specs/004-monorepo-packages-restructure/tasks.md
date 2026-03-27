@@ -93,10 +93,10 @@
 
 **Purpose**: Documentation accuracy and final validation across all stories.
 
-- [ ] T019 [P] Update `packages/foc-demo/README.md` — replace `demo/dist/cli.js` with `packages/foc-demo/dist/cli.js`; replace `../README.md` link with the correct relative path to the repo root README (`../../README.md`)
-- [ ] T020 [P] Run `pnpm exec biome check .` from repo root — confirm no new lint errors introduced by moved or updated files
-- [ ] T021 Run full end-to-end verification from repo root: `pnpm install && pnpm -r build && pnpm -r test && pnpm exec biome check .`
-- [ ] T022 Confirm root `package.json` has no `exports`, `files`, or `src/`/`dist/` references (validates SC-005 from spec)
+- [x] T019 [P] Update `packages/foc-demo/README.md` — replace `demo/dist/cli.js` with `packages/foc-demo/dist/cli.js`; replace `../README.md` link with the correct relative path to the repo root README (`../../README.md`)
+- [x] T020 [P] Run `pnpm exec biome check .` from repo root — confirm no new lint errors introduced by moved or updated files
+- [x] T021 Run full end-to-end verification from repo root: `pnpm install && pnpm -r build && pnpm -r test && pnpm exec biome check .`
+- [x] T022 Confirm root `package.json` has no `exports`, `files`, or `src/`/`dist/` references (validates SC-005 from spec)
 - [ ] T023 Commit all changes with a descriptive commit message referencing this feature branch
 
 ---

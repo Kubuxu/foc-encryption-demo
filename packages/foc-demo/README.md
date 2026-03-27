@@ -1,6 +1,6 @@
 # foc-demo CLI
 
-A command-line tool for encrypting files with [foc-encryption](../README.md) and storing them on [Filecoin Onchain Cloud (FOC)](https://filecoin.io) warm storage via [synapse-sdk](https://github.com/filoz/synapse-sdk).
+A command-line tool for encrypting files with [foc-encryption](../../README.md) and storing them on [Filecoin Onchain Cloud (FOC)](https://filecoin.io) warm storage via [synapse-sdk](https://github.com/filoz/synapse-sdk).
 
 ## Prerequisites
 
@@ -16,10 +16,10 @@ pnpm install
 pnpm --filter foc-demo build
 ```
 
-After building, the CLI is available at `demo/dist/cli.js`:
+After building, the CLI is available at `packages/foc-demo/dist/cli.js`:
 
 ```bash
-node demo/dist/cli.js --help
+node packages/foc-demo/dist/cli.js --help
 ```
 
 ## Commands
@@ -28,13 +28,13 @@ node demo/dist/cli.js --help
 
 ```bash
 # With a password (PBKDF2-derived key, salt stored in blob)
-node demo/dist/cli.js encrypt myfile.pdf --password "my secret passphrase" --output myfile.pdf.enc
+node packages/foc-demo/dist/cli.js encrypt myfile.pdf --password "my secret passphrase" --output myfile.pdf.enc
 
 # With a raw hex key (64 hex characters = 256-bit key)
-node demo/dist/cli.js encrypt myfile.pdf --key a1b2c3...64hexchars... --output myfile.pdf.enc
+node packages/foc-demo/dist/cli.js encrypt myfile.pdf --key a1b2c3...64hexchars... --output myfile.pdf.enc
 
 # Default output path is <input>.enc
-node demo/dist/cli.js encrypt myfile.pdf --password "passphrase"
+node packages/foc-demo/dist/cli.js encrypt myfile.pdf --password "passphrase"
 # → writes myfile.pdf.enc
 ```
 
@@ -44,13 +44,13 @@ Files ≤ 256 KiB use AES-256-GCM. Files > 256 KiB use Chunked AES-256-GCM (seek
 
 ```bash
 # With matching password
-node demo/dist/cli.js decrypt myfile.pdf.enc --password "my secret passphrase" --output myfile.pdf
+node packages/foc-demo/dist/cli.js decrypt myfile.pdf.enc --password "my secret passphrase" --output myfile.pdf
 
 # With raw hex key
-node demo/dist/cli.js decrypt myfile.pdf.enc --key a1b2c3...64hexchars... --output myfile.pdf
+node packages/foc-demo/dist/cli.js decrypt myfile.pdf.enc --key a1b2c3...64hexchars... --output myfile.pdf
 
 # Default output path strips .enc suffix (adds .dec if no .enc suffix)
-node demo/dist/cli.js decrypt myfile.pdf.enc --password "passphrase"
+node packages/foc-demo/dist/cli.js decrypt myfile.pdf.enc --password "passphrase"
 # → writes myfile.pdf
 ```
 
@@ -61,14 +61,14 @@ Requires a Filecoin wallet with USDFC balance for storage payments.
 ```bash
 export FOC_PRIVATE_KEY=0xabcdef...  # or use --private-key flag
 
-node demo/dist/cli.js upload myfile.pdf --password "my secret passphrase"
+node packages/foc-demo/dist/cli.js upload myfile.pdf --password "my secret passphrase"
 # Output:
 #   Encrypting myfile.pdf (1.2 MB, chunked AES-256-GCM)...
 #   Uploading encrypted blob (1.2 MB)...
 #   PieceCID:       baga6ea4seaq...
 #   Retrieval URL:  https://...
 
-node demo/dist/cli.js upload myfile.pdf --key a1b2c3...64hexchars... --private-key 0xabcdef...
+node packages/foc-demo/dist/cli.js upload myfile.pdf --key a1b2c3...64hexchars... --private-key 0xabcdef...
 ```
 
 The PieceCID and Retrieval URL are both printed. The Retrieval URL can be shared and used without a wallet.
@@ -77,16 +77,16 @@ The PieceCID and Retrieval URL are both printed. The Retrieval URL can be shared
 
 ```bash
 # Using HTTP Retrieval URL (no wallet needed — shareable)
-node demo/dist/cli.js download https://provider.example/piece/baga6ea4seaq... \
+node packages/foc-demo/dist/cli.js download https://provider.example/piece/baga6ea4seaq... \
   --password "my secret passphrase" --output myfile.pdf
 
 # Using PieceCID (requires wallet to resolve to a URL)
 export FOC_PRIVATE_KEY=0xabcdef...
-node demo/dist/cli.js download baga6ea4seaq... \
+node packages/foc-demo/dist/cli.js download baga6ea4seaq... \
   --password "my secret passphrase" --output myfile.pdf
 
 # With hex key
-node demo/dist/cli.js download https://provider.example/piece/baga6ea4seaq... \
+node packages/foc-demo/dist/cli.js download https://provider.example/piece/baga6ea4seaq... \
   --key a1b2c3...64hexchars... --output myfile.pdf
 ```
 
@@ -96,16 +96,16 @@ Efficiently decrypts a byte range from a chunked-encrypted blob using HTTP Range
 
 ```bash
 # Using HTTP URL (no wallet needed)
-node demo/dist/cli.js range https://provider.example/piece/baga6ea4seaq... \
+node packages/foc-demo/dist/cli.js range https://provider.example/piece/baga6ea4seaq... \
   --password "my secret passphrase" --offset 0 --length 1024 --output header.bin
 
 # Using PieceCID (requires wallet)
 export FOC_PRIVATE_KEY=0xabcdef...
-node demo/dist/cli.js range baga6ea4seaq... \
+node packages/foc-demo/dist/cli.js range baga6ea4seaq... \
   --password "my secret passphrase" --offset 0 --length 1024 --output header.bin
 
 # Output to stdout (omit --output)
-node demo/dist/cli.js range https://provider.example/piece/baga6ea4seaq... \
+node packages/foc-demo/dist/cli.js range https://provider.example/piece/baga6ea4seaq... \
   --key a1b2c3...64hexchars... --offset 4096 --length 256
 ```
 
