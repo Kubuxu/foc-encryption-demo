@@ -59,6 +59,8 @@ pnpm typecheck  # TypeScript type-check
 
 Blobs must be encrypted with `foc-encryption` and include a `pbkdf2_salt` field in `appMetadata`. Use `foc-demo` to produce compatible blobs.
 
-## Sample
-Sample URL: https://calib2.ezpdpz.net/piece/bafkzcibeudqbmed2hq75hjwry67454ubmecbcqltv7mhvxh7yaw2ztvvqjbhjeeyei
-Sample Password: `hardPasswordSure`
+## Live Demo
+
+[**Open live demo**](https://bafybeifmoyptennzufqyp2id3ufa4yfyumrrz7ci4ok4sufwltggzy24nu.ipfs.dweb.link/#url=https%3A%2F%2Fcalib2.ezpdpz.net%2Fpiece%2Fbafkzcibeudqbmed2hq75hjwry67454ubmecbcqltv7mhvxh7yaw2ztvvqjbhjeeyei) — password: `hardPasswordSure`
+
+The viewer is hosted on IPFS. The encrypted blob is stored on Filecoin warm storage. Decryption happens entirely in your browser.
