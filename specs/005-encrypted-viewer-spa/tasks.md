@@ -69,8 +69,8 @@
 
 ### Implementation
 
-- [ ] T013 [US2] Add `manual-entry` mode to main.ts: show form via ui.ts, handle "View Content" submit → decrypt pipeline → renderContent → update fragment in packages/foc-viewer/src/main.ts
-- [ ] T014 [US2] Update URL fragment after successful decrypt using `history.replaceState` and `buildFragment` in packages/foc-viewer/src/main.ts
+- [x] T013 [US2] Add `manual-entry` mode to main.ts: show form via ui.ts, handle "View Content" submit → decrypt pipeline → renderContent → update fragment in packages/foc-viewer/src/main.ts
+- [x] T014 [US2] Update URL fragment after successful decrypt using `history.replaceState` and `buildFragment` in packages/foc-viewer/src/main.ts
 
 **Checkpoint**: US1 + US2 both work. Manual entry form and auto-decrypt from fragment.
 
