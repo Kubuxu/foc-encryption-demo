@@ -6,7 +6,37 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  packages/foc-demo:
+    dependencies:
+      '@filoz/synapse-sdk':
+        specifier: ^0.40.0
+        version: 0.40.0(typescript@5.9.3)(viem@2.47.6(typescript@5.9.3)(zod@4.3.6))
+      cleye:
+        specifier: ^1.3.2
+        version: 1.3.4
+      foc-encryption:
+        specifier: workspace:*
+        version: link:../foc-encryption
+      viem:
+        specifier: ^2.0.0
+        version: 2.47.6(typescript@5.9.3)(zod@4.3.6)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.7.5
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@22.7.5)
+      wireit:
+        specifier: ^0.14.0
+        version: 0.14.12
+
+  packages/foc-encryption:
     dependencies:
       cborg:
         specifier: ^4.3.0
@@ -20,34 +50,6 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.1.0
-        version: 3.2.4(@types/node@22.7.5)
-      wireit:
-        specifier: ^0.14.0
-        version: 0.14.12
-
-  demo:
-    dependencies:
-      '@filoz/synapse-sdk':
-        specifier: ^0.40.0
-        version: 0.40.0(typescript@5.9.3)(viem@2.47.6(typescript@5.9.3)(zod@4.3.6))
-      cleye:
-        specifier: ^1.3.2
-        version: 1.3.4
-      foc-encryption:
-        specifier: workspace:*
-        version: link:..
-      viem:
-        specifier: ^2.0.0
-        version: 2.47.6(typescript@5.9.3)(zod@4.3.6)
-    devDependencies:
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.7.5
-      typescript:
-        specifier: ^5.9.0
-        version: 5.9.3
-      vitest:
-        specifier: ^3.0.0
         version: 3.2.4(@types/node@22.7.5)
       wireit:
         specifier: ^0.14.0
