@@ -19,7 +19,7 @@ The viewer is a single HTML file hosted on IPFS. The encrypted blob lives on Fil
                               ┌─────────┐
   encrypt ──► upload ────────►│encrypted│
                               │  blob   │
-  viewer  ◄── download ◄─────│         │
+  viewer  ◄── download ◄──────│         │
   (IPFS)      + decrypt       └─────────┘
      │           ▲
      │     PBKDF2 key
@@ -124,7 +124,7 @@ The binary blob is structured as:
 - **Small files (≤256 KiB):** AES-256-GCM — single encrypt/decrypt
 - **Large files (>256 KiB):** Chunked AES-256-GCM — seekable, supports HTTP Range decryption
 
-The COSE envelope contains the algorithm identifier, IV, recipient key info, and application metadata (e.g. PBKDF2 salt). This design decouples key management from the data path, allowing future integration with distributed key management solutions like [Lit Protocol](https://litprotocol.com/).
+The COSE envelope contains the algorithm identifier, IV, recipient key info, and application metadata (e.g. PBKDF2 salt). This design decouples key management from the data path, allowing future integration with distributed key management.
 
 ## Development
 
