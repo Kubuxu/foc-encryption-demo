@@ -1,22 +1,10 @@
+import { type DecodeOptions, Tagged } from 'cborg'
+
 export const COSE_TAG_ENCRYPT0 = 16
 export const COSE_TAG_ENCRYPT = 96
 
-export interface CborTagged<T = unknown> {
-  tag: number
-  value: T
-}
-
-function makeTagged(tag: number, value: unknown): CborTagged {
-  return { tag, value }
-}
-
-/** Sparse array of tag decoders indexed by CBOR tag number */
-const coseTagDecoders: ((value: unknown) => CborTagged)[] = []
-coseTagDecoders[COSE_TAG_ENCRYPT0] = (value) => makeTagged(COSE_TAG_ENCRYPT0, value)
-coseTagDecoders[COSE_TAG_ENCRYPT] = (value) => makeTagged(COSE_TAG_ENCRYPT, value)
-
-/** Standard decode options for COSE structures: integer map keys + COSE tags */
-export const coseDecodeOptions = {
-  tags: coseTagDecoders,
+/** Standard decode options for COSE structures: integer map keys + COSE tags round-tripped as `Tagged`. */
+export const coseDecodeOptions: DecodeOptions = {
+  tags: Tagged.preserve(COSE_TAG_ENCRYPT0, COSE_TAG_ENCRYPT),
   useMaps: true,
-} as const
+}
