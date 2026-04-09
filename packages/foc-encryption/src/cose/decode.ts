@@ -1,8 +1,8 @@
-import * as cborg from 'cborg'
+import { Tagged, decode, decodeFirst } from 'cborg'
 import { MalformedEnvelopeError } from '../errors.js'
 import type { RecipientInfo } from '../types.js'
 import { COSE_HEADER_ALG, COSE_HEADER_IV, COSE_HEADER_KID, CoseHeaderParam } from './headers.js'
-import { COSE_TAG_ENCRYPT, COSE_TAG_ENCRYPT0, type CborTagged, coseDecodeOptions } from './tags.js'
+import { COSE_TAG_ENCRYPT, COSE_TAG_ENCRYPT0, coseDecodeOptions } from './tags.js'
 
 export interface DecodedEnvelope {
   tag: number
@@ -17,19 +17,22 @@ export interface DecodedEnvelope {
 }
 
 export function decodeCoseEnvelope(blob: Uint8Array): DecodedEnvelope {
-  let tagged: CborTagged
+  let decoded: unknown
   let remainder: Uint8Array
   try {
-    ;[tagged, remainder] = cborg.decodeFirst(blob, coseDecodeOptions) as [CborTagged, Uint8Array]
-  } catch {
-    throw new MalformedEnvelopeError('Failed to decode COSE envelope: invalid CBOR')
+    ;[decoded, remainder] = decodeFirst(blob, coseDecodeOptions)
+  } catch (err) {
+    throw new MalformedEnvelopeError('Failed to decode COSE envelope: invalid CBOR', { cause: err })
   }
 
-  if (!tagged || (tagged.tag !== COSE_TAG_ENCRYPT0 && tagged.tag !== COSE_TAG_ENCRYPT)) {
-    throw new MalformedEnvelopeError(`Expected COSE_Encrypt0 (tag 16) or COSE_Encrypt (tag 96), got tag ${tagged?.tag}`)
+  if (!(decoded instanceof Tagged)) {
+    throw new MalformedEnvelopeError('Expected a CBOR-tagged COSE envelope')
+  }
+  if (decoded.tag !== COSE_TAG_ENCRYPT0 && decoded.tag !== COSE_TAG_ENCRYPT) {
+    throw new MalformedEnvelopeError(`Expected COSE_Encrypt0 (tag 16) or COSE_Encrypt (tag 96), got tag ${decoded.tag}`)
   }
 
-  const arr = tagged.value as unknown[]
+  const arr = decoded.value as unknown[]
   if (!Array.isArray(arr) || arr.length < 3) {
     throw new MalformedEnvelopeError('COSE envelope must be an array of at least 3 elements')
   }
@@ -39,9 +42,9 @@ export function decodeCoseEnvelope(blob: Uint8Array): DecodedEnvelope {
 
   let protectedMap: Map<number, unknown>
   try {
-    protectedMap = cborg.decode(protectedBytes, { useMaps: true }) as Map<number, unknown>
-  } catch {
-    throw new MalformedEnvelopeError('Failed to decode protected headers')
+    protectedMap = decode(protectedBytes, { useMaps: true }) as Map<number, unknown>
+  } catch (err) {
+    throw new MalformedEnvelopeError('Failed to decode protected headers', { cause: err })
   }
 
   const algorithm = protectedMap.get(COSE_HEADER_ALG)
@@ -59,7 +62,7 @@ export function decodeCoseEnvelope(blob: Uint8Array): DecodedEnvelope {
   const appMetadata = unprotectedMap.get(CoseHeaderParam.APP_METADATA) as Map<string, unknown> | undefined
 
   let recipients: RecipientInfo[] = []
-  if (tagged.tag === COSE_TAG_ENCRYPT && arr.length >= 4) {
+  if (decoded.tag === COSE_TAG_ENCRYPT && arr.length >= 4) {
     const recipientArr = arr[3] as unknown[][]
     if (Array.isArray(recipientArr)) {
       recipients = recipientArr.map(parseRecipient)
@@ -69,7 +72,7 @@ export function decodeCoseEnvelope(blob: Uint8Array): DecodedEnvelope {
   const envelopeSize = blob.length - remainder.length
 
   return {
-    tag: tagged.tag,
+    tag: decoded.tag,
     algorithm,
     iv,
     protectedHeaders: protectedBytes,
@@ -88,7 +91,7 @@ function parseRecipient(arr: unknown[]): RecipientInfo {
 
   let rProtected: Map<number, unknown>
   try {
-    rProtected = cborg.decode(rProtectedBytes, { useMaps: true }) as Map<number, unknown>
+    rProtected = decode(rProtectedBytes, { useMaps: true }) as Map<number, unknown>
   } catch {
     rProtected = new Map()
   }

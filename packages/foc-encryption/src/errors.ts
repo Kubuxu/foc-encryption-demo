@@ -1,8 +1,8 @@
 export class FocEncryptionError extends Error {
   readonly code: string = 'FOC_ENCRYPTION_ERROR'
 
-  constructor(message: string) {
-    super(message)
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options)
     this.name = this.constructor.name
   }
 }
