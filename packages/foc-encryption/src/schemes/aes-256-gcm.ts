@@ -1,7 +1,7 @@
 import { buildEncStructure } from '../cose/structures.js'
 import { aesGcmDecrypt, aesGcmEncrypt, getRandomValues } from '../crypto.js'
 import { AuthenticationError } from '../errors.js'
-import type { DecryptMetadata, EncryptResult, EncryptionScheme } from './scheme.js'
+import type { DecryptMetadata, EncryptResult, EncryptionScheme, EncStructureContext } from './scheme.js'
 
 const AES_GCM_IV_LENGTH = 12
 const AES_GCM_TAG_LENGTH = 16
@@ -11,9 +11,14 @@ export class Aes256Gcm implements EncryptionScheme {
   readonly algorithmId = 3
   readonly isSeekable = false
 
-  async encrypt(key: CryptoKey, plaintext: Uint8Array, protectedHeaders: Uint8Array): Promise<EncryptResult> {
+  async encrypt(
+    key: CryptoKey,
+    plaintext: Uint8Array,
+    protectedHeaders: Uint8Array,
+    context: EncStructureContext
+  ): Promise<EncryptResult> {
     const iv = getRandomValues(AES_GCM_IV_LENGTH)
-    const aad = buildEncStructure('Encrypt0', protectedHeaders, new Uint8Array(0))
+    const aad = buildEncStructure(context, protectedHeaders, new Uint8Array(0))
     const ciphertext = await aesGcmEncrypt(key, iv, plaintext, aad)
     return { ciphertext, iv }
   }
@@ -23,9 +28,10 @@ export class Aes256Gcm implements EncryptionScheme {
     ciphertext: Uint8Array,
     iv: Uint8Array,
     protectedHeaders: Uint8Array,
+    context: EncStructureContext,
     _metadata?: DecryptMetadata
   ): Promise<Uint8Array> {
-    const aad = buildEncStructure('Encrypt0', protectedHeaders, new Uint8Array(0))
+    const aad = buildEncStructure(context, protectedHeaders, new Uint8Array(0))
     try {
       return await aesGcmDecrypt(key, iv, ciphertext, aad)
     } catch {

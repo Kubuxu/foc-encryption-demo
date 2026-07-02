@@ -6,7 +6,7 @@ import { MalformedEnvelopeError, SchemeNotSeekableError, UnsupportedSchemeError 
 import { importAndZeroCek, validateCek } from './key-utils.js'
 import { Aes256Gcm } from './schemes/aes-256-gcm.js'
 import { ChunkedAes256GcmStream, DEFAULT_CHUNK_SIZE } from './schemes/chunked-aes-256-gcm.js'
-import type { DecryptMetadata, EncryptionScheme } from './schemes/scheme.js'
+import type { DecryptMetadata, EncryptionScheme, EncStructureContext } from './schemes/scheme.js'
 import type {
   AppMetadata,
   BlobFetcher,
@@ -30,6 +30,16 @@ function getScheme(algorithmId: number, chunkSize?: number): EncryptionScheme {
   }
 }
 
+/**
+ * The COSE Enc_structure context follows the envelope structure (RFC 9052
+ * Section 5.3): "Encrypt" when the envelope carries recipients (COSE_Encrypt,
+ * tag 96) and "Encrypt0" otherwise (COSE_Encrypt0, tag 16). The body AEAD must
+ * authenticate the context that matches the structure it ships in.
+ */
+function encStructureContext(recipients?: readonly unknown[]): EncStructureContext {
+  return recipients && recipients.length > 0 ? 'Encrypt' : 'Encrypt0'
+}
+
 export async function encrypt(
   plaintext: Uint8Array,
   cek: CEKBytes,
@@ -47,7 +57,8 @@ export async function encrypt(
   const cekCopy = new Uint8Array(cek)
   const key = await importAndZeroCek(cekCopy)
 
-  const result = await scheme.encrypt(key, plaintext, protectedHeaders, options.appMetadata)
+  const context = encStructureContext(recipients)
+  const result = await scheme.encrypt(key, plaintext, protectedHeaders, context, options.appMetadata)
 
   let envelope: Uint8Array
   const encodeOpts = {
@@ -79,8 +90,9 @@ export async function decrypt(blob: Uint8Array, cek: CEKBytes): Promise<Uint8Arr
   const cekCopy = new Uint8Array(cek)
   const key = await importAndZeroCek(cekCopy)
 
+  const context = encStructureContext(envelope.recipients)
   const metadata: DecryptMetadata = { chunkSize: envelope.chunkSize, chunkCount: envelope.chunkCount }
-  return scheme.decrypt(key, parsed.ciphertext, envelope.iv, envelope.protectedHeaders, metadata)
+  return scheme.decrypt(key, parsed.ciphertext, envelope.iv, envelope.protectedHeaders, context, metadata)
 }
 
 export async function decryptRange(
@@ -119,11 +131,13 @@ export async function decryptRange(
   const fetchLength = ctEnd !== undefined ? ctEnd - ctStart : (lastChunk - firstChunk + 1) * ciphertextChunkSize // overfetch last chunk is OK
   const fetched = await fetcher.fetchRange(ctStart, fetchLength)
 
+  const context = encStructureContext(metadata.recipients)
   return chunkedScheme.decryptRange(
     key,
     fetched,
     metadata.iv,
     metadata.protectedHeaders,
+    context,
     range.offset - firstChunk * effectiveChunkSize,
     range.length,
     effectiveChunkSize,
