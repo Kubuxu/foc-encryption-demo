@@ -20,7 +20,7 @@ describe('Aes256Gcm scheme', () => {
     const plaintext = new Uint8Array([1, 2, 3, 4, 5])
     const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, 3]]))
 
-    const result = await scheme.encrypt(key, plaintext, protectedHeaders)
+    const result = await scheme.encrypt(key, plaintext, protectedHeaders, 'Encrypt0')
 
     expect(result.ciphertext.length).toBe(plaintext.length + 16)
     expect(result.iv.length).toBe(12)
@@ -32,8 +32,8 @@ describe('Aes256Gcm scheme', () => {
     const plaintext = new Uint8Array([1, 2, 3])
     const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, 3]]))
 
-    const r1 = await scheme.encrypt(key, plaintext, protectedHeaders)
-    const r2 = await scheme.encrypt(key, plaintext, protectedHeaders)
+    const r1 = await scheme.encrypt(key, plaintext, protectedHeaders, 'Encrypt0')
+    const r2 = await scheme.encrypt(key, plaintext, protectedHeaders, 'Encrypt0')
 
     expect(r1.iv).not.toEqual(r2.iv)
   })
@@ -44,7 +44,7 @@ describe('Aes256Gcm scheme', () => {
     const plaintext = new Uint8Array(32).fill(0x42)
     const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, 3]]))
 
-    const result = await scheme.encrypt(key, plaintext, protectedHeaders)
+    const result = await scheme.encrypt(key, plaintext, protectedHeaders, 'Encrypt0')
     const ciphertextPrefix = result.ciphertext.slice(0, plaintext.length)
 
     expect(ciphertextPrefix).not.toEqual(plaintext)
@@ -56,8 +56,8 @@ describe('Aes256Gcm scheme', () => {
     const plaintext = new Uint8Array([10, 20, 30, 40, 50])
     const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, 3]]))
 
-    const result = await scheme.encrypt(key, plaintext, protectedHeaders)
-    const decrypted = await scheme.decrypt(key, result.ciphertext, result.iv, protectedHeaders)
+    const result = await scheme.encrypt(key, plaintext, protectedHeaders, 'Encrypt0')
+    const decrypted = await scheme.decrypt(key, result.ciphertext, result.iv, protectedHeaders, 'Encrypt0')
 
     expect(decrypted).toEqual(plaintext)
   })
@@ -70,8 +70,8 @@ describe('Aes256Gcm scheme', () => {
     const plaintext = new Uint8Array([1, 2, 3])
     const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, 3]]))
 
-    const result = await scheme.encrypt(key1, plaintext, protectedHeaders)
-    await expect(scheme.decrypt(key2, result.ciphertext, result.iv, protectedHeaders)).rejects.toThrow(
+    const result = await scheme.encrypt(key1, plaintext, protectedHeaders, 'Encrypt0')
+    await expect(scheme.decrypt(key2, result.ciphertext, result.iv, protectedHeaders, 'Encrypt0')).rejects.toThrow(
       AuthenticationError
     )
   })
@@ -82,10 +82,10 @@ describe('Aes256Gcm scheme', () => {
     const plaintext = new Uint8Array([1, 2, 3])
     const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, 3]]))
 
-    const result = await scheme.encrypt(key, plaintext, protectedHeaders)
+    const result = await scheme.encrypt(key, plaintext, protectedHeaders, 'Encrypt0')
     // Flip a byte in ciphertext
     result.ciphertext[0] ^= 0xff
-    await expect(scheme.decrypt(key, result.ciphertext, result.iv, protectedHeaders)).rejects.toThrow(
+    await expect(scheme.decrypt(key, result.ciphertext, result.iv, protectedHeaders, 'Encrypt0')).rejects.toThrow(
       AuthenticationError
     )
   })

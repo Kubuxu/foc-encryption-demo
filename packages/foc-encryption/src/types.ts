@@ -23,7 +23,10 @@ export interface AppMetadata {
   [key: string]: Uint8Array | string | number | boolean | undefined
 }
 
+export type CoseEnvelopeTag = 16 | 96
+
 export interface EnvelopeMetadata {
+  tag: CoseEnvelopeTag
   algorithm: CoseAlgorithmId
   seekable: boolean
   iv: Uint8Array

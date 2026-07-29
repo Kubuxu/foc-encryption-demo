@@ -1,11 +1,11 @@
 import { Tagged, decode, decodeFirst } from 'cborg'
 import { MalformedEnvelopeError } from '../errors.js'
-import type { RecipientInfo } from '../types.js'
+import type { CoseEnvelopeTag, RecipientInfo } from '../types.js'
 import { COSE_HEADER_ALG, COSE_HEADER_IV, COSE_HEADER_KID, CoseHeaderParam } from './headers.js'
 import { COSE_TAG_ENCRYPT, COSE_TAG_ENCRYPT0, coseDecodeOptions } from './tags.js'
 
 export interface DecodedEnvelope {
-  tag: number
+  tag: CoseEnvelopeTag
   algorithm: number
   iv: Uint8Array
   protectedHeaders: Uint8Array

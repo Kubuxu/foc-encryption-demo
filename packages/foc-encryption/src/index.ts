@@ -27,6 +27,8 @@ export type {
   ChunkedEncryptOptions,
   /** Union of supported COSE algorithm IDs. */
   CoseAlgorithmId,
+  /** COSE envelope tags that determine the authenticated encryption context. */
+  CoseEnvelopeTag,
   /** Options for encrypt(): algorithm selection and optional metadata. */
   EncryptOptions,
   /** Parsed envelope metadata — available without a decryption key. */

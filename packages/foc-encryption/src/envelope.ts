@@ -2,11 +2,12 @@ import { assembleBlob, parseBlob } from './blob.js'
 import { decodeCoseEnvelope } from './cose/decode.js'
 import { encodeCoseEncrypt, encodeCoseEncrypt0, getProtectedHeaderBytes } from './cose/encode.js'
 import { CoseAlgorithm } from './cose/headers.js'
+import { COSE_TAG_ENCRYPT, COSE_TAG_ENCRYPT0 } from './cose/tags.js'
 import { MalformedEnvelopeError, SchemeNotSeekableError, UnsupportedSchemeError } from './errors.js'
 import { importAndZeroCek, validateCek } from './key-utils.js'
 import { Aes256Gcm } from './schemes/aes-256-gcm.js'
 import { ChunkedAes256GcmStream, DEFAULT_CHUNK_SIZE } from './schemes/chunked-aes-256-gcm.js'
-import type { DecryptMetadata, EncryptionScheme } from './schemes/scheme.js'
+import type { DecryptMetadata, EncStructureContext, EncryptionScheme } from './schemes/scheme.js'
 import type {
   AppMetadata,
   BlobFetcher,
@@ -14,6 +15,7 @@ import type {
   CEKBytes,
   ChunkedEncryptOptions,
   CoseAlgorithmId,
+  CoseEnvelopeTag,
   EncryptOptions,
   EnvelopeMetadata,
   Recipient,
@@ -28,6 +30,15 @@ function getScheme(algorithmId: number, chunkSize?: number): EncryptionScheme {
     default:
       throw new UnsupportedSchemeError(algorithmId)
   }
+}
+
+/**
+ * The COSE Enc_structure context follows the envelope tag (RFC 9052
+ * Section 5.3): "Encrypt" for COSE_Encrypt (tag 96) and "Encrypt0" for
+ * COSE_Encrypt0 (tag 16).
+ */
+function encStructureContext(tag: CoseEnvelopeTag): EncStructureContext {
+  return tag === COSE_TAG_ENCRYPT ? 'Encrypt' : 'Encrypt0'
 }
 
 export async function encrypt(
@@ -47,7 +58,10 @@ export async function encrypt(
   const cekCopy = new Uint8Array(cek)
   const key = await importAndZeroCek(cekCopy)
 
-  const result = await scheme.encrypt(key, plaintext, protectedHeaders, options.appMetadata)
+  const envelopeRecipients = recipients?.length ? recipients : undefined
+  const tag = envelopeRecipients ? COSE_TAG_ENCRYPT : COSE_TAG_ENCRYPT0
+  const context = encStructureContext(tag)
+  const result = await scheme.encrypt(key, plaintext, protectedHeaders, context, options.appMetadata)
 
   let envelope: Uint8Array
   const encodeOpts = {
@@ -56,13 +70,13 @@ export async function encrypt(
     chunkCount: result.chunkCount,
   }
 
-  if (recipients && recipients.length > 0) {
-    for (const r of recipients) {
+  if (envelopeRecipients) {
+    for (const r of envelopeRecipients) {
       if (!r.wrappedKey || r.wrappedKey.length === 0) {
         throw new MalformedEnvelopeError('Recipient must have a non-empty wrappedKey')
       }
     }
-    envelope = encodeCoseEncrypt(options.algorithm, result.iv, recipients, encodeOpts)
+    envelope = encodeCoseEncrypt(options.algorithm, result.iv, envelopeRecipients, encodeOpts)
   } else {
     envelope = encodeCoseEncrypt0(options.algorithm, result.iv, encodeOpts)
   }
@@ -79,8 +93,9 @@ export async function decrypt(blob: Uint8Array, cek: CEKBytes): Promise<Uint8Arr
   const cekCopy = new Uint8Array(cek)
   const key = await importAndZeroCek(cekCopy)
 
+  const context = encStructureContext(envelope.tag)
   const metadata: DecryptMetadata = { chunkSize: envelope.chunkSize, chunkCount: envelope.chunkCount }
-  return scheme.decrypt(key, parsed.ciphertext, envelope.iv, envelope.protectedHeaders, metadata)
+  return scheme.decrypt(key, parsed.ciphertext, envelope.iv, envelope.protectedHeaders, context, metadata)
 }
 
 export async function decryptRange(
@@ -119,11 +134,13 @@ export async function decryptRange(
   const fetchLength = ctEnd !== undefined ? ctEnd - ctStart : (lastChunk - firstChunk + 1) * ciphertextChunkSize // overfetch last chunk is OK
   const fetched = await fetcher.fetchRange(ctStart, fetchLength)
 
+  const context = encStructureContext(metadata.tag)
   return chunkedScheme.decryptRange(
     key,
     fetched,
     metadata.iv,
     metadata.protectedHeaders,
+    context,
     range.offset - firstChunk * effectiveChunkSize,
     range.length,
     effectiveChunkSize,
@@ -149,6 +166,7 @@ function parseEnvelopeBytes(blob: Uint8Array): EnvelopeMetadata {
   }
 
   return {
+    tag: envelope.tag,
     algorithm: envelope.algorithm as CoseAlgorithmId,
     seekable,
     iv: envelope.iv,
