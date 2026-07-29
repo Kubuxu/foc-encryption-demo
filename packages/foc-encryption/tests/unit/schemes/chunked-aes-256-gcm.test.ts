@@ -169,7 +169,17 @@ describe('ChunkedAes256GcmStream edge cases', () => {
     const protectedHeaders = cborg.encode(new Map([[COSE_HEADER_ALG, -65793]]))
 
     await expect(
-      scheme.decryptRange(key, new Uint8Array(0), new Uint8Array(7), protectedHeaders, 'Encrypt0', 0, 1, 16, MAX_CHUNK_INDEX + 2)
+      scheme.decryptRange(
+        key,
+        new Uint8Array(0),
+        new Uint8Array(7),
+        protectedHeaders,
+        'Encrypt0',
+        0,
+        1,
+        16,
+        MAX_CHUNK_INDEX + 2
+      )
     ).rejects.toThrow(/exceeds the 4-byte counter maximum/)
   })
 })

@@ -1,9 +1,12 @@
+import { Tagged, encode } from 'cborg'
 import { describe, expect, it } from 'vitest'
-import { parseBlob } from '../../src/blob.js'
+import { assembleBlob, parseBlob } from '../../src/blob.js'
 import { CoseAlgorithm } from '../../src/cose/headers.js'
 import { buildEncStructure } from '../../src/cose/structures.js'
+import { COSE_TAG_ENCRYPT } from '../../src/cose/tags.js'
 import { aesGcmDecrypt, importAesGcmKey } from '../../src/crypto.js'
-import { encrypt, parseEnvelope } from '../../src/envelope.js'
+import { decrypt, encrypt, parseEnvelope } from '../../src/envelope.js'
+import { AuthenticationError } from '../../src/errors.js'
 import { deriveChunkNonce } from '../../src/schemes/chunked-aes-256-gcm.js'
 import type { Recipient } from '../../src/types.js'
 
@@ -48,5 +51,14 @@ describe('body AAD context matches the envelope structure (RFC 9052 Section 5.3)
     expect(new TextDecoder().decode(opened)).toBe(message)
 
     await expect(openChunk0(blob, cek, 'Encrypt')).rejects.toThrow()
+  })
+  it('rejects a tag-16 body rewrapped as tag 96 with no recipients', async () => {
+    const encrypt0Blob = await encrypt(plaintext, cek, opts)
+    const { envelopeValue, ciphertext } = parseBlob(encrypt0Blob)
+    const encrypt0Envelope = envelopeValue as Tagged
+    const encryptEnvelope = encode(new Tagged(COSE_TAG_ENCRYPT, [...(encrypt0Envelope.value as unknown[]), []]))
+    const substitutedBlob = assembleBlob(encryptEnvelope, ciphertext)
+
+    await expect(decrypt(substitutedBlob, cek)).rejects.toThrow(AuthenticationError)
   })
 })

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { CoseAlgorithm } from '../../src/cose/headers.js'
 import { decrypt, decryptRange, encrypt, parseEnvelope } from '../../src/envelope.js'
 import { SchemeNotSeekableError } from '../../src/errors.js'
-import type { BlobFetcher } from '../../src/types.js'
+import type { BlobFetcher, Recipient } from '../../src/types.js'
 
 /** Create a BlobFetcher backed by a full encrypted blob. */
 function makeBlobFetcher(blob: Uint8Array): BlobFetcher {
@@ -48,6 +48,24 @@ describe('seekable encryption (chunked AES-256-GCM STREAM)', () => {
     const fetcher = makeBlobFetcher(blob)
     const range = await decryptRange(fetcher, meta, cek, { offset: 64, length: 64 })
     expect(range).toEqual(plaintext.slice(64, 128))
+  })
+
+  it('range decryption with recipients uses the COSE_Encrypt context', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = new Uint8Array(128).fill(0x42)
+    const recipients: Recipient[] = [{ algorithm: -3, wrappedKey: new Uint8Array([1, 2, 3]) }]
+    const blob = await encrypt(
+      plaintext,
+      cek,
+      { algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM, chunkSize: 64 },
+      recipients
+    )
+
+    const meta = parseEnvelope(blob)
+    const range = await decryptRange(makeBlobFetcher(blob), meta, cek, { offset: 32, length: 64 })
+
+    expect(meta.tag).toBe(96)
+    expect(range).toEqual(plaintext.slice(32, 96))
   })
 
   it('range spanning chunk boundaries', async () => {

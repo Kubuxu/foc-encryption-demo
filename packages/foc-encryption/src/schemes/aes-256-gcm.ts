@@ -1,7 +1,7 @@
 import { buildEncStructure } from '../cose/structures.js'
 import { aesGcmDecrypt, aesGcmEncrypt, getRandomValues } from '../crypto.js'
 import { AuthenticationError } from '../errors.js'
-import type { DecryptMetadata, EncryptResult, EncryptionScheme, EncStructureContext } from './scheme.js'
+import type { DecryptMetadata, EncStructureContext, EncryptResult, EncryptionScheme } from './scheme.js'
 
 const AES_GCM_IV_LENGTH = 12
 const AES_GCM_TAG_LENGTH = 16

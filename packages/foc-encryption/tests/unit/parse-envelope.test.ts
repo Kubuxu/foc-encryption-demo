@@ -14,6 +14,7 @@ describe('parseEnvelope', () => {
     const metadata = parseEnvelope(blob)
 
     expect(metadata.algorithm).toBe(3)
+    expect(metadata.tag).toBe(16)
     expect(metadata.seekable).toBe(false)
     expect(metadata.iv.length).toBe(12)
     expect(metadata.envelopeSize).toBeGreaterThan(0)
@@ -66,6 +67,7 @@ describe('parseEnvelope', () => {
     const blob = await encrypt(plaintext, cek, { algorithm: CoseAlgorithm.AES_256_GCM }, recipients)
     const metadata = parseEnvelope(blob)
 
+    expect(metadata.tag).toBe(96)
     expect(metadata.recipients).toHaveLength(2)
     expect(metadata.recipients[0].algorithm).toBe(-3)
     expect(metadata.recipients[1].algorithm).toBe(-3)
