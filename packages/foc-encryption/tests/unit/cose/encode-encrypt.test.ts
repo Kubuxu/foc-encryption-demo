@@ -1,6 +1,6 @@
 import * as cborg from 'cborg'
 import { describe, expect, it } from 'vitest'
-import { encodeCoseEncrypt } from '../../../src/cose/encode.js'
+import { encodeCoseEncrypt, getProtectedHeaderBytes } from '../../../src/cose/encode.js'
 import { COSE_HEADER_ALG, COSE_HEADER_KID, CoseAlgorithm } from '../../../src/cose/headers.js'
 import { coseDecodeOptions } from '../../../src/cose/tags.js'
 import type { Recipient } from '../../../src/types.js'
@@ -23,7 +23,7 @@ describe('encodeCoseEncrypt (tag 96)', () => {
 
   it('produces CBOR tag 96', () => {
     const iv = new Uint8Array(12).fill(0xab)
-    const encoded = encodeCoseEncrypt(CoseAlgorithm.AES_256_GCM, iv, recipients)
+    const encoded = encodeCoseEncrypt(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv, recipients)
     const decoded = cborg.decode(encoded, decodeOpts)
 
     expect(decoded.tag).toBe(96)
@@ -31,7 +31,7 @@ describe('encodeCoseEncrypt (tag 96)', () => {
 
   it('contains 4-element array [protected, unprotected, null, recipients]', () => {
     const iv = new Uint8Array(12).fill(0xab)
-    const encoded = encodeCoseEncrypt(CoseAlgorithm.AES_256_GCM, iv, recipients)
+    const encoded = encodeCoseEncrypt(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv, recipients)
     const decoded = cborg.decode(encoded, decodeOpts)
     const arr = decoded.value as unknown[]
 
@@ -41,7 +41,7 @@ describe('encodeCoseEncrypt (tag 96)', () => {
 
   it('encodes each recipient as [protected, unprotected, ciphertext]', () => {
     const iv = new Uint8Array(12).fill(0xab)
-    const encoded = encodeCoseEncrypt(CoseAlgorithm.AES_256_GCM, iv, recipients)
+    const encoded = encodeCoseEncrypt(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv, recipients)
     const decoded = cborg.decode(encoded, decodeOpts)
     const arr = decoded.value as unknown[]
     const recipientArr = arr[3] as unknown[][]
@@ -59,7 +59,7 @@ describe('encodeCoseEncrypt (tag 96)', () => {
 
   it('recipient protected headers contain alg', () => {
     const iv = new Uint8Array(12).fill(0xab)
-    const encoded = encodeCoseEncrypt(CoseAlgorithm.AES_256_GCM, iv, recipients)
+    const encoded = encodeCoseEncrypt(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv, recipients)
     const decoded = cborg.decode(encoded, decodeOpts)
     const arr = decoded.value as unknown[]
     const recipientArr = arr[3] as unknown[][]
@@ -70,7 +70,7 @@ describe('encodeCoseEncrypt (tag 96)', () => {
 
   it('recipient unprotected headers contain kid', () => {
     const iv = new Uint8Array(12).fill(0xab)
-    const encoded = encodeCoseEncrypt(CoseAlgorithm.AES_256_GCM, iv, recipients)
+    const encoded = encodeCoseEncrypt(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv, recipients)
     const decoded = cborg.decode(encoded, decodeOpts)
     const arr = decoded.value as unknown[]
     const recipientArr = arr[3] as unknown[][]

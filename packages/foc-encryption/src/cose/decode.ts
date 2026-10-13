@@ -57,8 +57,16 @@ export function decodeCoseEnvelope(blob: Uint8Array): DecodedEnvelope {
     throw new MalformedEnvelopeError('Missing IV in unprotected headers')
   }
 
-  const chunkSize = unprotectedMap.get(CoseHeaderParam.CHUNK_SIZE) as number | undefined
-  const chunkCount = unprotectedMap.get(CoseHeaderParam.CHUNK_COUNT) as number | undefined
+  // Chunk size and count are protected: the AAD authenticates them. A copy in
+  // the unprotected bucket is unauthenticated and would be ambiguous, so it
+  // makes the envelope malformed rather than being ignored.
+  for (const label of [CoseHeaderParam.CHUNK_SIZE, CoseHeaderParam.CHUNK_COUNT]) {
+    if (unprotectedMap.has(label)) {
+      throw new MalformedEnvelopeError(`Header ${label} must be in the protected headers`)
+    }
+  }
+  const chunkSize = protectedInt(protectedMap, CoseHeaderParam.CHUNK_SIZE)
+  const chunkCount = protectedInt(protectedMap, CoseHeaderParam.CHUNK_COUNT)
   const appMetadata = unprotectedMap.get(CoseHeaderParam.APP_METADATA) as Map<string, unknown> | undefined
 
   let recipients: RecipientInfo[] = []
@@ -82,6 +90,17 @@ export function decodeCoseEnvelope(blob: Uint8Array): DecodedEnvelope {
     recipients,
     envelopeSize,
   }
+}
+
+function protectedInt(protectedMap: Map<number, unknown>, label: number): number | undefined {
+  const value = protectedMap.get(label)
+  if (value === undefined) {
+    return undefined
+  }
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) {
+    throw new MalformedEnvelopeError(`Header ${label} must be a non-negative integer`)
+  }
+  return value
 }
 
 function parseRecipient(arr: unknown[]): RecipientInfo {

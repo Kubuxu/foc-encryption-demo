@@ -1,3 +1,4 @@
+import type { ProtectedHeaderParams } from '../cose/encode.js'
 import { buildEncStructure } from '../cose/structures.js'
 import { aesGcmDecrypt, aesGcmEncrypt, getRandomValues } from '../crypto.js'
 import { AuthenticationError } from '../errors.js'
@@ -10,6 +11,10 @@ export class Aes256Gcm implements EncryptionScheme {
   readonly name = 'AES-256-GCM'
   readonly algorithmId = 3
   readonly isSeekable = false
+
+  protectedParams(_plaintextLength: number): ProtectedHeaderParams {
+    return {}
+  }
 
   async encrypt(
     key: CryptoKey,

@@ -41,17 +41,17 @@ A COSE_Encrypt or COSE_Encrypt0 structure in detached-payload mode.
 |-------|------|------|----------|-------------|
 | 1 | `alg` | int | YES | COSE algorithm identifier. `3` = AES-256-GCM, `-65537` = Chunked-AES-256-GCM-STREAM |
 | 16 | `typ` | tstr | YES | Envelope type identifier: `"application/vnd.foc-envelope+cose"` |
+| -65790 | `chunk_size` | uint | Chunked only | Chunk size in bytes (default 262144 = 256 KiB) |
+| -65791 | `chunk_count` | uint | Chunked only | Total number of chunks |
 
 #### Unprotected Headers
 
 | Label | Name | Type | Required | Description |
 |-------|------|------|----------|-------------|
 | 5 | `iv` | bstr | YES | Initialization vector. 12 bytes for AES-256-GCM simple scheme. 7-byte base nonce for chunked scheme. |
-| -65790 | `chunk_size` | uint | Chunked only | Chunk size in bytes (default 262144 = 256 KiB) |
-| -65791 | `chunk_count` | uint | Chunked only | Total number of chunks |
 | -65792 | `app_metadata` | map | NO | Application metadata (CBOR map with string keys, see below) |
 
-**Note**: `iv` is in unprotected headers because it does not need authentication — it is bound into the AEAD computation via the nonce. The `alg` and `typ` are in protected headers because they determine processing semantics and must be authenticated.
+**Note**: `iv` is in unprotected headers because it does not need authentication — it is bound into the AEAD computation via the nonce. The `alg`, `typ`, `chunk_size` and `chunk_count` are in protected headers because they determine processing semantics and must be authenticated: an authenticated chunk count lets a range read detect truncation without fetching the final chunk. A decoder rejects an envelope that carries `chunk_size` or `chunk_count` in the unprotected headers.
 
 #### Application Metadata Map (`-65792`)
 

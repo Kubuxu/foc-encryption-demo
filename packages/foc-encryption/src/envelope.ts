@@ -53,7 +53,7 @@ export async function encrypt(
       ? (options as ChunkedEncryptOptions).chunkSize
       : undefined
   const scheme = getScheme(options.algorithm, chunkSize)
-  const protectedHeaders = getProtectedHeaderBytes(options.algorithm)
+  const protectedHeaders = getProtectedHeaderBytes(options.algorithm, scheme.protectedParams(plaintext.length))
 
   const cekCopy = new Uint8Array(cek)
   const key = await importAndZeroCek(cekCopy)
@@ -64,11 +64,7 @@ export async function encrypt(
   const result = await scheme.encrypt(key, plaintext, protectedHeaders, context, options.appMetadata)
 
   let envelope: Uint8Array
-  const encodeOpts = {
-    appMetadata: options.appMetadata,
-    chunkSize: result.chunkSize,
-    chunkCount: result.chunkCount,
-  }
+  const encodeOpts = { appMetadata: options.appMetadata }
 
   if (envelopeRecipients) {
     for (const r of envelopeRecipients) {
@@ -76,9 +72,9 @@ export async function encrypt(
         throw new MalformedEnvelopeError('Recipient must have a non-empty wrappedKey')
       }
     }
-    envelope = encodeCoseEncrypt(options.algorithm, result.iv, envelopeRecipients, encodeOpts)
+    envelope = encodeCoseEncrypt(protectedHeaders, result.iv, envelopeRecipients, encodeOpts)
   } else {
-    envelope = encodeCoseEncrypt0(options.algorithm, result.iv, encodeOpts)
+    envelope = encodeCoseEncrypt0(protectedHeaders, result.iv, encodeOpts)
   }
 
   return assembleBlob(envelope, result.ciphertext)
