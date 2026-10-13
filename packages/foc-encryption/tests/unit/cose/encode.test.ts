@@ -1,6 +1,6 @@
 import * as cborg from 'cborg'
 import { describe, expect, it } from 'vitest'
-import { encodeCoseEncrypt0 } from '../../../src/cose/encode.js'
+import { encodeCoseEncrypt0, getProtectedHeaderBytes } from '../../../src/cose/encode.js'
 import {
   COSE_HEADER_ALG,
   COSE_HEADER_IV,
@@ -15,7 +15,7 @@ const decodeOpts = coseDecodeOptions
 describe('encodeCoseEncrypt0', () => {
   it('produces CBOR-tagged structure with tag 16', () => {
     const iv = new Uint8Array(12).fill(0xab)
-    const encoded = encodeCoseEncrypt0(CoseAlgorithm.AES_256_GCM, iv)
+    const encoded = encodeCoseEncrypt0(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv)
     const decoded = cborg.decode(encoded, decodeOpts)
 
     expect(decoded).toBeDefined()
@@ -27,7 +27,7 @@ describe('encodeCoseEncrypt0', () => {
 
   it('encodes protected headers with alg and typ', () => {
     const iv = new Uint8Array(12).fill(0xab)
-    const encoded = encodeCoseEncrypt0(CoseAlgorithm.AES_256_GCM, iv)
+    const encoded = encodeCoseEncrypt0(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv)
     const decoded = cborg.decode(encoded, decodeOpts)
     const arr = decoded.value as [Uint8Array, Map<number, unknown>, null]
 
@@ -38,7 +38,7 @@ describe('encodeCoseEncrypt0', () => {
 
   it('encodes unprotected headers with iv', () => {
     const iv = new Uint8Array(12).fill(0xab)
-    const encoded = encodeCoseEncrypt0(CoseAlgorithm.AES_256_GCM, iv)
+    const encoded = encodeCoseEncrypt0(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv)
     const decoded = cborg.decode(encoded, decodeOpts)
     const arr = decoded.value as [Uint8Array, Map<number, unknown>, null]
 
@@ -49,7 +49,7 @@ describe('encodeCoseEncrypt0', () => {
   it('includes app_metadata in unprotected headers when provided', () => {
     const iv = new Uint8Array(12).fill(0xab)
     const appMeta = { cid: new Uint8Array([1, 2, 3]) }
-    const encoded = encodeCoseEncrypt0(CoseAlgorithm.AES_256_GCM, iv, { appMetadata: appMeta })
+    const encoded = encodeCoseEncrypt0(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv, { appMetadata: appMeta })
     const decoded = cborg.decode(encoded, decodeOpts)
     const arr = decoded.value as [Uint8Array, Map<number, unknown>, null]
     const unprotectedMap = arr[1] as Map<number, unknown>

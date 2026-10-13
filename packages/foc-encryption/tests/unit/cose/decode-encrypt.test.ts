@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { decodeCoseEnvelope } from '../../../src/cose/decode.js'
-import { encodeCoseEncrypt } from '../../../src/cose/encode.js'
+import { encodeCoseEncrypt, getProtectedHeaderBytes } from '../../../src/cose/encode.js'
 import { CoseAlgorithm } from '../../../src/cose/headers.js'
 import type { Recipient } from '../../../src/types.js'
 
@@ -20,7 +20,7 @@ describe('decodeCoseEnvelope with tag 96', () => {
 
   it('parses tag 96 envelope', () => {
     const iv = new Uint8Array(12).fill(0xab)
-    const encoded = encodeCoseEncrypt(CoseAlgorithm.AES_256_GCM, iv, recipients)
+    const encoded = encodeCoseEncrypt(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv, recipients)
 
     const result = decodeCoseEnvelope(encoded)
 
@@ -31,7 +31,7 @@ describe('decodeCoseEnvelope with tag 96', () => {
 
   it('extracts recipients array with alg/kid/wrappedKey', () => {
     const iv = new Uint8Array(12).fill(0xab)
-    const encoded = encodeCoseEncrypt(CoseAlgorithm.AES_256_GCM, iv, recipients)
+    const encoded = encodeCoseEncrypt(getProtectedHeaderBytes(CoseAlgorithm.AES_256_GCM), iv, recipients)
 
     const result = decodeCoseEnvelope(encoded)
 

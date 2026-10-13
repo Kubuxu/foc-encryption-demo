@@ -1,3 +1,4 @@
+import type { ProtectedHeaderParams } from '../cose/encode.js'
 import type { AppMetadata } from '../types.js'
 
 /**
@@ -18,6 +19,13 @@ export interface EncryptionScheme {
   readonly name: string
   readonly algorithmId: number
   readonly isSeekable: boolean
+
+  /**
+   * The algorithm parameters this scheme records in the protected header for
+   * a plaintext of the given length. They are fixed before encryption so
+   * that every chunk's AAD authenticates them.
+   */
+  protectedParams(plaintextLength: number): ProtectedHeaderParams
 
   encrypt(
     key: CryptoKey,

@@ -61,9 +61,10 @@ The encrypted blob is binary-concatenated: `[COSE_Envelope][Ciphertext]`
 ### Chunked-AES-256-GCM-STREAM (Seekable, Algorithm -65793)
 - CBOR tag 16 or 96
 - Same envelope structure as above
-- Additional unprotected headers:
+- Additional protected headers, authenticated by every chunk's AAD:
   - CHUNK_SIZE (plaintext chunk size, default 256 KiB)
   - CHUNK_COUNT (total number of chunks)
+- An envelope carrying CHUNK_SIZE or CHUNK_COUNT in its unprotected headers is rejected as malformed
 - Nonce derivation per chunk:
   ```
   nonce[0..6]   = base_nonce[0..6] (7 bytes)

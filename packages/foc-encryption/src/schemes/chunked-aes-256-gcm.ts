@@ -1,3 +1,4 @@
+import type { ProtectedHeaderParams } from '../cose/encode.js'
 import { buildEncStructure } from '../cose/structures.js'
 import { aesGcmDecrypt, aesGcmEncrypt, getRandomValues } from '../crypto.js'
 import { AuthenticationError, FocEncryptionError, MalformedEnvelopeError } from '../errors.js'
@@ -23,6 +24,14 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
     this.chunkSize = params?.chunkSize ?? DEFAULT_CHUNK_SIZE
   }
 
+  protectedParams(plaintextLength: number): ProtectedHeaderParams {
+    return { chunkSize: this.chunkSize, chunkCount: this.chunkCountFor(plaintextLength) }
+  }
+
+  private chunkCountFor(plaintextLength: number): number {
+    return Math.max(1, Math.ceil(plaintextLength / this.chunkSize))
+  }
+
   async encrypt(
     key: CryptoKey,
     plaintext: Uint8Array,
@@ -30,7 +39,7 @@ export class ChunkedAes256GcmStream implements EncryptionScheme {
     context: EncStructureContext
   ): Promise<EncryptResult> {
     const baseNonce = getRandomValues(BASE_NONCE_LENGTH)
-    const chunkCount = Math.max(1, Math.ceil(plaintext.length / this.chunkSize))
+    const chunkCount = this.chunkCountFor(plaintext.length)
     if (chunkCount - 1 > MAX_CHUNK_INDEX) {
       throw new FocEncryptionError(
         `Plaintext too large: ${chunkCount} chunks exceeds the 4-byte counter maximum (${MAX_CHUNK_INDEX + 1})`

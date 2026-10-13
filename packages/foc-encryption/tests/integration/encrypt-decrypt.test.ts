@@ -1,8 +1,14 @@
 import * as cborg from 'cborg'
 import { describe, expect, it } from 'vitest'
-import { COSE_HEADER_ALG, COSE_HEADER_TYP, CoseAlgorithm, FOC_ENVELOPE_TYPE } from '../../src/cose/headers.js'
+import {
+  COSE_HEADER_ALG,
+  COSE_HEADER_TYP,
+  CoseAlgorithm,
+  CoseHeaderParam,
+  FOC_ENVELOPE_TYPE,
+} from '../../src/cose/headers.js'
 import { coseDecodeOptions } from '../../src/cose/tags.js'
-import { decrypt, encrypt, parseEnvelope } from '../../src/envelope.js'
+import { decrypt, decryptRange, encrypt, parseEnvelope } from '../../src/envelope.js'
 import { AuthenticationError, MalformedEnvelopeError, UnsupportedSchemeError } from '../../src/errors.js'
 
 const decodeOpts = coseDecodeOptions
@@ -134,6 +140,34 @@ describe('decrypt integration', () => {
 
     await expect(decrypt(tampered, cek)).rejects.toThrow(AuthenticationError)
   })
+
+  it('tampered chunk count fails even a range that avoids the final chunk', async () => {
+    const cek = crypto.getRandomValues(new Uint8Array(32))
+    const plaintext = crypto.getRandomValues(new Uint8Array(3 * 4096))
+    const blob = await encrypt(plaintext, cek, {
+      algorithm: CoseAlgorithm.CHUNKED_AES_256_GCM_STREAM,
+      chunkSize: 4096,
+    })
+
+    // Rewrite the protected chunk count from 3 to 2, leaving the ciphertext alone.
+    const [envelope, ciphertext] = cborg.decodeFirst(blob, coseDecodeOptions) as [cborg.Tagged, Uint8Array]
+    const arr = envelope.value as unknown[]
+    const protectedMap = cborg.decode(arr[0] as Uint8Array, { useMaps: true }) as Map<number, unknown>
+    expect(protectedMap.get(CoseHeaderParam.CHUNK_COUNT)).toBe(3)
+    protectedMap.set(CoseHeaderParam.CHUNK_COUNT, 2)
+    arr[0] = cborg.encode(protectedMap)
+    const forgedEnvelope = cborg.encode(new cborg.Tagged(envelope.tag, arr))
+    const forged = new Uint8Array(forgedEnvelope.length + ciphertext.length)
+    forged.set(forgedEnvelope)
+    forged.set(ciphertext, forgedEnvelope.length)
+
+    const fetcher = {
+      fetchRange: async (start: number, length: number) => forged.subarray(start, start + length),
+    }
+    await expect(decryptRange(fetcher, parseEnvelope(forged), cek, { offset: 0, length: 16 })).rejects.toThrow(
+      AuthenticationError
+    )
+  })
 })
 
 describe('unsupported scheme', () => {
@@ -152,9 +186,9 @@ describe('unsupported scheme', () => {
     const blob = await encrypt(plaintext, cek, { algorithm: CoseAlgorithm.AES_256_GCM })
 
     // Build a blob with unknown algorithm using low-level encoding
-    const { encodeCoseEncrypt0 } = await import('../../src/cose/encode.js')
+    const { encodeCoseEncrypt0, getProtectedHeaderBytes } = await import('../../src/cose/encode.js')
     const { assembleBlob } = await import('../../src/blob.js')
-    const envelope = encodeCoseEncrypt0(9999, new Uint8Array(12))
+    const envelope = encodeCoseEncrypt0(getProtectedHeaderBytes(9999), new Uint8Array(12))
     const fakeBlob = assembleBlob(envelope, new Uint8Array(32))
 
     await expect(decrypt(fakeBlob, cek)).rejects.toThrow(UnsupportedSchemeError)

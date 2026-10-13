@@ -12,6 +12,14 @@ import { COSE_TAG_ENCRYPT, COSE_TAG_ENCRYPT0 } from './tags.js'
 
 interface EncodeOptions {
   appMetadata?: AppMetadata
+}
+
+/**
+ * Algorithm parameters carried in the protected header. They are
+ * authenticated by every chunk's AAD, so they must be known before
+ * encryption starts.
+ */
+export interface ProtectedHeaderParams {
   chunkSize?: number
   chunkCount?: number
 }
@@ -19,12 +27,6 @@ interface EncodeOptions {
 function buildUnprotectedMap(iv: Uint8Array, options?: EncodeOptions): Map<number, unknown> {
   const unprotectedMap = new Map<number, unknown>([[COSE_HEADER_IV, iv]])
 
-  if (options?.chunkSize !== undefined) {
-    unprotectedMap.set(CoseHeaderParam.CHUNK_SIZE, options.chunkSize)
-  }
-  if (options?.chunkCount !== undefined) {
-    unprotectedMap.set(CoseHeaderParam.CHUNK_COUNT, options.chunkCount)
-  }
   if (options?.appMetadata) {
     unprotectedMap.set(CoseHeaderParam.APP_METADATA, encodeAppMetadata(options.appMetadata))
   }
@@ -32,19 +34,25 @@ function buildUnprotectedMap(iv: Uint8Array, options?: EncodeOptions): Map<numbe
   return unprotectedMap
 }
 
-export function encodeCoseEncrypt0(algorithmId: number, iv: Uint8Array, options?: EncodeOptions): Uint8Array {
-  const protectedBytes = getProtectedHeaderBytes(algorithmId)
+/**
+ * Encodes a COSE_Encrypt0 envelope. protectedBytes must be the exact bytes
+ * the ciphertext was sealed against (see getProtectedHeaderBytes).
+ */
+export function encodeCoseEncrypt0(protectedBytes: Uint8Array, iv: Uint8Array, options?: EncodeOptions): Uint8Array {
   const unprotectedMap = buildUnprotectedMap(iv, options)
   return encode(new Tagged(COSE_TAG_ENCRYPT0, [protectedBytes, unprotectedMap, null]))
 }
 
+/**
+ * Encodes a COSE_Encrypt envelope. protectedBytes must be the exact bytes
+ * the ciphertext was sealed against (see getProtectedHeaderBytes).
+ */
 export function encodeCoseEncrypt(
-  algorithmId: number,
+  protectedBytes: Uint8Array,
   iv: Uint8Array,
   recipients: Recipient[],
   options?: EncodeOptions
 ): Uint8Array {
-  const protectedBytes = getProtectedHeaderBytes(algorithmId)
   const unprotectedMap = buildUnprotectedMap(iv, options)
 
   const recipientStructures = recipients.map((r) => {
@@ -64,11 +72,17 @@ export function encodeCoseEncrypt(
   return encode(new Tagged(COSE_TAG_ENCRYPT, [protectedBytes, unprotectedMap, null, recipientStructures]))
 }
 
-export function getProtectedHeaderBytes(algorithmId: number): Uint8Array {
+export function getProtectedHeaderBytes(algorithmId: number, params?: ProtectedHeaderParams): Uint8Array {
   const protectedMap = new Map<number, unknown>([
     [COSE_HEADER_ALG, algorithmId],
     [COSE_HEADER_TYP, FOC_ENVELOPE_TYPE],
   ])
+  if (params?.chunkSize !== undefined) {
+    protectedMap.set(CoseHeaderParam.CHUNK_SIZE, params.chunkSize)
+  }
+  if (params?.chunkCount !== undefined) {
+    protectedMap.set(CoseHeaderParam.CHUNK_COUNT, params.chunkCount)
+  }
   return encode(protectedMap)
 }
 
